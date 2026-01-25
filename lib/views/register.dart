@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:mobile/views/widgets/build_widget.dart';
 import 'role_selection_page.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -10,14 +11,15 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
-  // --- Controllers ---
+  // textField Controller
   final _emailController = TextEditingController();
   final _phoneController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
 
-  // Biến điều khiển ẩn/hiện mật khẩu
+  // an hien mat khau va nhap lai mat khau
   bool _isPasswordVisible = false;
+  bool _isConfirmedPasswordVisible = false;
 
   @override
   void dispose() {
@@ -29,7 +31,6 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   void _nextStep() {
-    // 1. Kiểm tra rỗng
     if (_emailController.text.isEmpty ||
         _phoneController.text.isEmpty ||
         _passwordController.text.isEmpty) {
@@ -39,7 +40,6 @@ class _RegisterPageState extends State<RegisterPage> {
       return;
     }
 
-    // 2. So sánh mật khẩu
     if (_passwordController.text != _confirmPasswordController.text) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Mật khẩu xác nhận không khớp!")),
@@ -76,7 +76,7 @@ class _RegisterPageState extends State<RegisterPage> {
               // Logo/Brand
               Text(
                 "BetterUS",
-                style: GoogleFonts.readexPro(
+                style: GoogleFonts.roboto(
                   fontSize: 36,
                   fontWeight: FontWeight.bold,
                   color: const Color(0xFF008080),
@@ -85,7 +85,7 @@ class _RegisterPageState extends State<RegisterPage> {
               const SizedBox(height: 8),
               Text(
                 "Tạo tài khoản",
-                style: GoogleFonts.readexPro(
+                style: GoogleFonts.roboto(
                   fontSize: 24,
                   fontWeight: FontWeight.w600,
                   color: const Color(0xFF12151C),
@@ -95,29 +95,32 @@ class _RegisterPageState extends State<RegisterPage> {
               Text(
                 "Tham gia cộng đồng để bắt đầu tạo sự khác biệt.",
                 textAlign: TextAlign.center,
-                style: GoogleFonts.inter(fontSize: 14, color: Colors.grey[600]),
+                style: GoogleFonts.roboto(
+                  fontSize: 14,
+                  color: Colors.grey[600],
+                ),
               ),
               const SizedBox(height: 40),
 
               // Form Inputs
-              _buildInputLabel("Số điện thoại"),
-              _buildTextField(
+              buildInputLabel("Số điện thoại"),
+              buildTextField(
                 controller: _phoneController,
                 hint: "Nhập số điện thoại của bạn",
                 icon: Icons.phone_outlined,
                 keyboardType: TextInputType.phone,
               ),
 
-              _buildInputLabel("Địa chỉ Email"),
-              _buildTextField(
+              buildInputLabel("Địa chỉ Email"),
+              buildTextField(
                 controller: _emailController,
                 hint: "Nhập email của bạn",
                 icon: Icons.email_outlined,
                 keyboardType: TextInputType.emailAddress,
               ),
 
-              _buildInputLabel("Mật khẩu"),
-              _buildTextField(
+              buildInputLabel("Mật khẩu"),
+              buildTextField(
                 controller: _passwordController,
                 hint: "Nhập mật khẩu",
                 icon: Icons.lock_outline,
@@ -135,14 +138,25 @@ class _RegisterPageState extends State<RegisterPage> {
                 ),
               ),
 
-              _buildInputLabel("Xác nhận mật khẩu"),
-              _buildTextField(
+              buildInputLabel("Xác nhận mật khẩu"),
+              buildTextField(
                 controller: _confirmPasswordController,
                 hint: "Nhập lại mật khẩu",
-                icon:
-                    Icons.history, // Icon đồng hồ/lịch sử theo yêu cầu của bạn
+                icon: Icons.history,
                 isPass: true,
-                isObserved: true, // Luôn ẩn mật khẩu xác nhận
+                isObserved: !_isConfirmedPasswordVisible,
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    _isConfirmedPasswordVisible
+                        ? Icons.visibility
+                        : Icons.visibility_off,
+                    color: Colors.grey,
+                  ),
+                  onPressed: () => setState(
+                    () => _isConfirmedPasswordVisible =
+                        !_isConfirmedPasswordVisible,
+                  ),
+                ),
               ),
 
               const SizedBox(height: 32),
@@ -163,7 +177,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   onPressed: _nextStep,
                   child: Text(
                     "Tiếp theo",
-                    style: GoogleFonts.inter(
+                    style: GoogleFonts.roboto(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
@@ -179,13 +193,13 @@ class _RegisterPageState extends State<RegisterPage> {
                 children: [
                   Text(
                     "Đã có tài khoản? ",
-                    style: GoogleFonts.inter(color: Colors.grey[600]),
+                    style: GoogleFonts.roboto(color: Colors.grey[600]),
                   ),
                   GestureDetector(
                     onTap: () => Navigator.pop(context),
                     child: Text(
                       "Đăng nhập",
-                      style: GoogleFonts.inter(
+                      style: GoogleFonts.roboto(
                         color: const Color(0xFF008080),
                         fontWeight: FontWeight.bold,
                       ),
@@ -194,65 +208,6 @@ class _RegisterPageState extends State<RegisterPage> {
                 ],
               ),
             ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  // Helper Widget: Tiêu đề cho mỗi ô nhập
-  Widget _buildInputLabel(String label) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8.0),
-      child: Align(
-        alignment: Alignment.centerLeft,
-        child: Text(
-          label,
-          style: GoogleFonts.inter(
-            fontWeight: FontWeight.bold,
-            fontSize: 14,
-            color: const Color(0xFF12151C),
-          ),
-        ),
-      ),
-    );
-  }
-
-  // Helper Widget: TextField chung
-  Widget _buildTextField({
-    required TextEditingController controller,
-    required String hint,
-    required IconData icon,
-    bool isPass = false,
-    bool isObserved = false,
-    Widget? suffixIcon,
-    TextInputType keyboardType = TextInputType.text,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 20.0),
-      child: TextField(
-        controller: controller,
-        obscureText: isObserved,
-        keyboardType: keyboardType,
-        style: GoogleFonts.inter(fontSize: 15),
-        decoration: InputDecoration(
-          hintText: hint,
-          hintStyle: GoogleFonts.inter(color: Colors.grey[400], fontSize: 14),
-          prefixIcon: Icon(icon, color: const Color(0xFF008080), size: 20),
-          suffixIcon: suffixIcon,
-          filled: true,
-          fillColor: const Color(0xFFF1F4F8),
-          contentPadding: const EdgeInsets.symmetric(
-            vertical: 16,
-            horizontal: 16,
-          ),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide.none,
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(color: Color(0xFF008080), width: 1.5),
           ),
         ),
       ),

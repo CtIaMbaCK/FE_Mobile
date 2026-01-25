@@ -1,19 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mobile/services/auth_service.dart';
-// Import 2 file profile mà tôi vừa đưa cho bạn ở trên
+
 import 'setup_beneficiary_profile.dart';
 import 'setup_volunteer_profile.dart';
 
 class RoleSelectionPage extends StatelessWidget {
-  final Map<String, dynamic>
-  basicData; // Nhận email, password, sdt từ trang Register
+  final Map<String, dynamic> basicData;
 
   const RoleSelectionPage({super.key, required this.basicData});
 
-  // Hàm xử lý logic quan trọng nhất: Đăng ký rồi mới đi tiếp
   void _handleRoleChoice(BuildContext context, String role) async {
-    // 1. Hiện vòng xoay chờ (Loading)
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -23,39 +20,30 @@ class RoleSelectionPage extends StatelessWidget {
     );
 
     final authService = AuthService();
-
-    // 2. Gửi 4 trường (email, password, phoneNumber, role) lên Backend
     final result = await authService.registerUser({...basicData, "role": role});
 
-    // 3. Tắt Loading sau khi API xong
     if (context.mounted) Navigator.pop(context);
 
     if (result != null) {
-      // Thành công: Lấy AccessToken và Email để truyền sang trang sau
       String token = result['accessToken'];
-
       if (context.mounted) {
-        // 4. Kiểm tra Role để điều hướng đúng trang
         if (role == "BENEFICIARY") {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) =>
-                  SetupBeneficiaryProfile(token: token),
+              builder: (context) => SetupBeneficiaryProfile(token: token),
             ),
           );
         } else {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) =>
-                  SetupVolunteerProfile(token: token),
+              builder: (context) => SetupVolunteerProfile(token: token),
             ),
           );
         }
       }
     } else {
-      // Thất bại: Hiện thông báo lỗi
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -78,60 +66,59 @@ class RoleSelectionPage extends StatelessWidget {
           onPressed: () => Navigator.pop(context),
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(
-              Icons.volunteer_activism,
-              size: 80,
-              color: Color(0xFF008080),
-            ),
-            const SizedBox(height: 24),
-            Text(
-              "Bạn tham gia với vai trò gì?",
-              textAlign: TextAlign.center,
-              style: GoogleFonts.readexPro(
-                fontSize: 26,
-                fontWeight: FontWeight.bold,
-                color: const Color(0xFF12151C),
+      body: Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(
+                Icons.volunteer_activism,
+                size: 80,
+                color: Color(0xFF008080),
               ),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              "Lựa chọn này giúp chúng tôi hỗ trợ bạn tốt nhất.",
-              textAlign: TextAlign.center,
-              style: GoogleFonts.inter(color: Colors.grey[600], fontSize: 15),
-            ),
-            const SizedBox(height: 48),
-
-            // Lựa chọn Tình nguyện viên
-            _roleCard(
-              context,
-              title: "Tôi muốn giúp đỡ",
-              sub: "Trở thành tình nguyện viên cộng đồng",
-              icon: Icons.favorite_rounded,
-              role: "VOLUNTEER",
-            ),
-
-            const SizedBox(height: 16),
-
-            // Lựa chọn Người cần giúp đỡ
-            _roleCard(
-              context,
-              title: "Tôi cần giúp đỡ",
-              sub: "Kết nối với sự hỗ trợ từ cộng đồng",
-              icon: Icons.front_hand_rounded,
-              role: "BENEFICIARY",
-            ),
-          ],
+              const SizedBox(height: 24),
+              Text(
+                "Bạn tham gia với vai trò gì?",
+                textAlign: TextAlign.center,
+                style: GoogleFonts.roboto(
+                  fontSize: 26,
+                  fontWeight: FontWeight.bold,
+                  color: const Color(0xFF12151C),
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                "Lựa chọn này giúp chúng tôi hỗ trợ bạn tốt nhất.",
+                textAlign: TextAlign.center,
+                style: GoogleFonts.roboto(
+                  color: Colors.grey[600],
+                  fontSize: 15,
+                ),
+              ),
+              const SizedBox(height: 48),
+              _roleCard(
+                context,
+                title: "Tôi muốn giúp đỡ",
+                sub: "Trở thành tình nguyện viên cộng đồng",
+                icon: Icons.favorite_rounded,
+                role: "VOLUNTEER",
+              ),
+              const SizedBox(height: 16),
+              _roleCard(
+                context,
+                title: "Tôi cần giúp đỡ",
+                sub: "Kết nối với sự hỗ trợ từ cộng đồng",
+                icon: Icons.front_hand_rounded,
+                role: "BENEFICIARY",
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  // Widget giao diện cho mỗi thẻ lựa chọn
   Widget _roleCard(
     BuildContext context, {
     required String title,
@@ -173,7 +160,7 @@ class RoleSelectionPage extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    style: GoogleFonts.inter(
+                    style: GoogleFonts.roboto(
                       fontWeight: FontWeight.bold,
                       fontSize: 17,
                       color: const Color(0xFF12151C),
@@ -182,7 +169,7 @@ class RoleSelectionPage extends StatelessWidget {
                   const SizedBox(height: 4),
                   Text(
                     sub,
-                    style: GoogleFonts.inter(
+                    style: GoogleFonts.roboto(
                       color: Colors.grey[600],
                       fontSize: 13,
                     ),

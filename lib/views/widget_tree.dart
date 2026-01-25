@@ -5,14 +5,14 @@ import 'package:mobile/services/auth_service.dart';
 import 'package:mobile/views/welcome_page.dart'; // Import trang Onboarding
 import 'package:mobile/views/pages/activities/activity_page.dart';
 import 'package:mobile/views/pages/home/home_page.dart';
-import 'package:mobile/views/pages/main_page.dart';
+import 'package:mobile/views/pages/emer/main_page.dart';
 import 'package:mobile/views/pages/profile/profile_page.dart';
 import 'package:mobile/views/pages/user_message.dart';
 import 'package:mobile/views/widgets/navbar_widget.dart';
 
 // Biến toàn cục để lưu user hiện tại (Để truy cập ở các trang con)
 // Bạn nên để cái này trong một file riêng như user_manager.dart hoặc trong notifiers.dart
-UserModel? currentUser; 
+UserModel? currentUser;
 
 List<Widget> pages = [
   const HomePage(),
@@ -57,7 +57,7 @@ class _WidgetTreeState extends State<WidgetTree> {
         // 2. Có dữ liệu: User đã đăng nhập
         if (snapshot.hasData && snapshot.data != null) {
           // QUAN TRỌNG: Lưu user vào biến toàn cục để dùng ở HomePage, ProfilePage...
-          currentUser = snapshot.data; 
+          currentUser = snapshot.data;
 
           return Scaffold(
             body: ValueListenableBuilder(
@@ -72,7 +72,7 @@ class _WidgetTreeState extends State<WidgetTree> {
 
         // 3. Không có dữ liệu (Chưa đăng nhập hoặc lỗi): Về Onboarding hoặc Login
         // Bạn có thể chọn về LoginPage() luôn hoặc OnBoardingPage() tùy logic
-        return const OnBoardingPage(); 
+        return const OnBoardingPage();
       },
     );
   }

@@ -101,27 +101,132 @@ class RequestService {
   }
 
   Future<bool> updateRequest(String id, Map<String, dynamic> data) async {
-  try {
-    String? token = await _authService.getToken();
-    final response = await http.patch(
-      Uri.parse('$baseUrl/request/$id'),
-      headers: {
-        'Authorization': 'Bearer $token',
-        'Content-Type': 'application/json',
-        'ngrok-skip-browser-warning': 'true',
-      },
-      body: jsonEncode(data),
-    );
+    try {
+      String? token = await _authService.getToken();
+      final response = await http.patch(
+        Uri.parse('$baseUrl/request/$id'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+          'ngrok-skip-browser-warning': 'true',
+        },
+        body: jsonEncode(data),
+      );
 
-    if (response.statusCode == 403) {
-      // In ra để xem Backend giải thích lý do bị cấm là gì
-      print("LỖI 403: ${response.body}"); 
+      if (response.statusCode == 403) {
+        print("LỖI 403: ${response.body}");
+      }
+
+      return response.statusCode == 200;
+    } catch (e) {
+      print("Lỗi kết nối: $e");
+      return false;
     }
-
-    return response.statusCode == 200;
-  } catch (e) {
-    print("Lỗi kết nối: $e");
-    return false;
   }
-}
+
+  // Lấy danh sách các yêu cầu APPROVED để hiển thị cho volunteer (map + list)
+  Future<List<HelpRequestModel>> getPendingRequests() async {
+    try {
+      String? token = await _authService.getToken();
+
+      final response = await http.get(
+        Uri.parse('$baseUrl/request/map-locations'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'ngrok-skip-browser-warning': 'true',
+          'Accept': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        List<dynamic> data = jsonDecode(response.body);
+        return data.map((item) => HelpRequestModel.fromJson(item)).toList();
+      } else {
+        print("Lỗi lấy map locations: ${response.statusCode}");
+        return [];
+      }
+    } catch (e) {
+      print("Lỗi kết nối API getPendingRequests: $e");
+      return [];
+    }
+  }
+
+  // Lấy chi tiết một request theo ID
+  Future<HelpRequestModel?> getRequestById(String id) async {
+    try {
+      String? token = await _authService.getToken();
+
+      final response = await http.get(
+        Uri.parse('$baseUrl/request/$id'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'ngrok-skip-browser-warning': 'true',
+          'Accept': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        return HelpRequestModel.fromJson(jsonDecode(response.body));
+      } else {
+        print("Lỗi lấy chi tiết request: ${response.statusCode}");
+        return null;
+      }
+    } catch (e) {
+      print("Lỗi kết nối API getRequestById: $e");
+      return null;
+    }
+  }
+
+  // Chấp nhận một yêu cầu giúp đỡ
+  Future<bool> acceptRequest(String requestId) async {
+    try {
+      String? token = await _authService.getToken();
+
+      final response = await http.patch(
+        Uri.parse('$baseUrl/request/$requestId/accept'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+          'ngrok-skip-browser-warning': 'true',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        return true;
+      } else {
+        print("Lỗi chấp nhận request: ${response.statusCode} - ${response.body}");
+        return false;
+      }
+    } catch (e) {
+      print("Lỗi kết nối API acceptRequest: $e");
+      return false;
+    }
+  }
+
+  // Lấy danh sách các yêu cầu mà volunteer đã nhận
+  Future<List<HelpRequestModel>> getVolunteerRequests() async {
+    try {
+      String? token = await _authService.getToken();
+
+      final response = await http.get(
+        Uri.parse('$baseUrl/request/volunteerRequests'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'ngrok-skip-browser-warning': 'true',
+          'Accept': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        List<dynamic> data = jsonDecode(response.body);
+        return data.map((item) => HelpRequestModel.fromJson(item)).toList();
+      } else {
+        print("Lỗi lấy volunteer requests: ${response.statusCode}");
+        return [];
+      }
+    } catch (e) {
+      print("Lỗi kết nối API getVolunteerRequests: $e");
+      return [];
+    }
+  }
 }

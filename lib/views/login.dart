@@ -35,7 +35,6 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
-  // Helper để build input field cho đồng bộ giao diện
   InputDecoration _buildDecoration({
     required String label,
     required IconData icon,
@@ -43,7 +42,7 @@ class _LoginPageState extends State<LoginPage> {
     return InputDecoration(
       labelText: label,
       prefixIcon: Icon(icon, color: const Color(0xFF008080), size: 20),
-      labelStyle: GoogleFonts.plusJakartaSans(color: const Color(0xFF57636C)),
+      labelStyle: GoogleFonts.roboto(color: const Color(0xFF57636C)),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(50),
         borderSide: const BorderSide(color: Color(0xFFF1F4F8), width: 2),
@@ -77,19 +76,23 @@ class _LoginPageState extends State<LoginPage> {
       // Hàm này sẽ lưu Token và tự gọi luôn hàm getMe() để lấy Profile
       bool success = await _authService.login(phone, password);
 
-      if (success) {
-        if (!mounted) return;
+      if (!mounted) return;
 
+      if (success) {
         // 3. Kiểm tra xem đã lấy được Profile chưa (để tránh lỗi null ở trang sau)
         if (AuthService.currentUser != null) {
-          // Lấy tên từ profile (dù là TNV hay Người cần giúp)
-          String name =
-              AuthService.currentUser!.profile?.fullName ?? "Thành viên";
+          // Lấy tên từ profile
+          final profile = AuthService.currentUser!.profile;
+          String name = profile?.fullName ?? "Thành viên";
 
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Chào mừng $name trở lại!'),
               backgroundColor: Colors.green,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
             ),
           );
 
@@ -99,11 +102,16 @@ class _LoginPageState extends State<LoginPage> {
             MaterialPageRoute(builder: (context) => const WidgetTree()),
             (route) => false,
           );
+        } else {
+          _showErrorSnackBar('Không thể lấy thông tin người dùng');
         }
       }
     } catch (error) {
       // Hiển thị lỗi từ Backend (ví dụ: "Sai mật khẩu", "Số điện thoại không tồn tại")
-      _showErrorSnackBar(error.toString().replaceAll('Exception:', ''));
+      String errorMessage = error.toString();
+      // Xóa "Exception: " prefix
+      errorMessage = errorMessage.replaceAll('Exception: ', '');
+      _showErrorSnackBar(errorMessage);
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -150,7 +158,7 @@ class _LoginPageState extends State<LoginPage> {
                       const SizedBox(width: 12),
                       Text(
                         'BetterUS',
-                        style: GoogleFonts.interTight(
+                        style: GoogleFonts.roboto(
                           fontSize: 32,
                           fontWeight: FontWeight.bold,
                           color: const Color(0xFF101213),
@@ -181,7 +189,7 @@ class _LoginPageState extends State<LoginPage> {
                       children: [
                         Text(
                           'Chào mừng trở lại',
-                          style: GoogleFonts.plusJakartaSans(
+                          style: GoogleFonts.roboto(
                             fontSize: 28,
                             fontWeight: FontWeight.bold,
                           ),
@@ -190,7 +198,7 @@ class _LoginPageState extends State<LoginPage> {
                         Text(
                           'Đăng nhập để tiếp tục hành trình ý nghĩa',
                           textAlign: TextAlign.center,
-                          style: GoogleFonts.plusJakartaSans(
+                          style: GoogleFonts.roboto(
                             color: const Color(0xFF57636C),
                           ),
                         ),
@@ -240,7 +248,7 @@ class _LoginPageState extends State<LoginPage> {
                             onPressed: () {},
                             child: Text(
                               'Quên mật khẩu?',
-                              style: GoogleFonts.inter(
+                              style: GoogleFonts.roboto(
                                 color: const Color(0xFF008080),
                                 fontWeight: FontWeight.bold,
                               ),
@@ -273,7 +281,7 @@ class _LoginPageState extends State<LoginPage> {
                                   )
                                 : Text(
                                     'ĐĂNG NHẬP',
-                                    style: GoogleFonts.interTight(
+                                    style: GoogleFonts.roboto(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -281,33 +289,33 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                         ),
 
-                        const SizedBox(height: 24),
-                        const Text(
-                          'hoặc',
-                          style: TextStyle(color: Color(0xFF57636C)),
-                        ),
-                        const SizedBox(height: 16),
+                        // const SizedBox(height: 24),
+                        // const Text(
+                        //   'hoặc',
+                        //   style: TextStyle(color: Color(0xFF57636C)),
+                        // ),
+                        // const SizedBox(height: 16),
 
-                        // Google Login
-                        OutlinedButton.icon(
-                          onPressed: () {},
-                          icon: const FaIcon(
-                            FontAwesomeIcons.google,
-                            size: 18,
-                            color: Colors.red,
-                          ),
-                          label: const Text('Đăng nhập bằng Google'),
-                          style: OutlinedButton.styleFrom(
-                            minimumSize: const Size(double.infinity, 50),
-                            side: const BorderSide(
-                              color: Color(0xFFF1F4F8),
-                              width: 2,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(50),
-                            ),
-                          ),
-                        ),
+                        // // Google Login
+                        // OutlinedButton.icon(
+                        //   onPressed: () {},
+                        //   icon: const FaIcon(
+                        //     FontAwesomeIcons.google,
+                        //     size: 18,
+                        //     color: Colors.red,
+                        //   ),
+                        //   label: const Text('Đăng nhập bằng Google'),
+                        //   style: OutlinedButton.styleFrom(
+                        //     minimumSize: const Size(double.infinity, 50),
+                        //     side: const BorderSide(
+                        //       color: Color(0xFFF1F4F8),
+                        //       width: 2,
+                        //     ),
+                        //     shape: RoundedRectangleBorder(
+                        //       borderRadius: BorderRadius.circular(50),
+                        //     ),
+                        //   ),
+                        // ),
 
                         const SizedBox(height: 24),
                         Row(

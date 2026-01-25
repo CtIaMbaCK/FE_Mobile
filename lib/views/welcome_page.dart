@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mobile/views/login.dart';
-import 'package:mobile/views/widget_tree.dart';
 // import 'package:mobile/views/widgets/navbar_widget.dart';
 
 void main() {

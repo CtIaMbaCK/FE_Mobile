@@ -28,6 +28,24 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+
+        // Load Google Maps API Key từ .env file
+        val envFile = rootProject.file("../.env")
+        var apiKey = "YOUR_API_KEY_HERE"
+
+        if (envFile.exists()) {
+            envFile.readLines().forEach { line ->
+                val trimmedLine = line.trim()
+                if (trimmedLine.isNotEmpty() && trimmedLine.contains("=")) {
+                    val parts = trimmedLine.split("=", limit = 2)
+                    if (parts.size == 2 && parts[0].trim() == "GOOGLE_MAPS_API_KEY") {
+                        apiKey = parts[1].trim()
+                    }
+                }
+            }
+        }
+
+        manifestPlaceholders["GOOGLE_MAPS_API_KEY"] = apiKey
     }
 
     buildTypes {

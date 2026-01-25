@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:mobile/dummy/dummyData.dart';
 import 'package:mobile/services/auth_service.dart';
+import 'package:mobile/services/volunteer_service.dart';
+import 'package:mobile/services/organization_service.dart';
+import 'package:mobile/services/blog_service.dart';
+import 'package:mobile/models/volunteer_honor_model.dart';
+import 'package:mobile/models/organization_model.dart';
+import 'package:mobile/models/blog_model.dart';
 import 'package:mobile/views/pages/home/blog_page.dart';
 import 'package:mobile/views/pages/home/buildCard.dart';
 import 'package:mobile/views/pages/home/organization_honor.dart';
-import 'package:mobile/views/pages/home/volunteer_honor.dart'; // Import Service
+import 'package:mobile/views/pages/home/volunteer_card.dart';
+import 'package:mobile/views/pages/home/organization_card.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -16,6 +22,61 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final Color primaryColor = const Color(0xFF008080);
+
+  List<VolunteerHonorModel> _topVolunteers = [];
+  List<OrganizationModel> _topOrganizations = [];
+  List<BlogModel> _topBlogs = [];
+  bool _isLoadingVolunteers = true;
+  bool _isLoadingOrgs = true;
+  bool _isLoadingBlogs = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    _loadVolunteers();
+    _loadOrganizations();
+    _loadBlogs();
+  }
+
+  Future<void> _loadVolunteers() async {
+    if (!mounted) return;
+    setState(() => _isLoadingVolunteers = true);
+    final service = VolunteerService();
+    final volunteers = await service.getTopVolunteers(limit: 3);
+    if (!mounted) return;
+    setState(() {
+      _topVolunteers = volunteers;
+      _isLoadingVolunteers = false;
+    });
+  }
+
+  Future<void> _loadOrganizations() async {
+    if (!mounted) return;
+    setState(() => _isLoadingOrgs = true);
+    final service = OrganizationService();
+    final orgs = await service.getTopOrganizations(limit: 5);
+    if (!mounted) return;
+    setState(() {
+      _topOrganizations = orgs;
+      _isLoadingOrgs = false;
+    });
+  }
+
+  Future<void> _loadBlogs() async {
+    if (!mounted) return;
+    setState(() => _isLoadingBlogs = true);
+    final service = BlogService();
+    final blogs = await service.getTopBlogs(limit: 2);
+    if (!mounted) return;
+    setState(() {
+      _topBlogs = blogs;
+      _isLoadingBlogs = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -265,51 +326,43 @@ class _HomePageState extends State<HomePage> {
                       ),
 
                       Container(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            InkWell(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) {
-                                      return OrganizationHonor();
+                        width: double.infinity,
+                        height: 300,
+                        child: _isLoadingOrgs
+                            ? Center(
+                                child: CircularProgressIndicator(
+                                  color: primaryColor,
+                                ),
+                              )
+                            : _topOrganizations.isEmpty
+                                ? Center(
+                                    child: Text(
+                                      'Chưa có dữ liệu',
+                                      style: GoogleFonts.inter(
+                                        fontSize: 14,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                                  )
+                                : ListView.builder(
+                                    itemCount: _topOrganizations.length,
+                                    itemBuilder: (context, index) {
+                                      final org = _topOrganizations[index];
+                                      return InkWell(
+                                        onTap: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) {
+                                                return OrganizationHonor();
+                                              },
+                                            ),
+                                          );
+                                        },
+                                        child: buildOrganizationHonorCard(org),
+                                      );
                                     },
                                   ),
-                                );
-                              },
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.transparent,
-                                  // color: Colors.red,
-                                ),
-                                width: double.infinity,
-                                height: 260,
-                                child: SingleChildScrollView(
-                                  padding: EdgeInsets.symmetric(vertical: 10.0),
-                                  child: Wrap(
-                                    alignment: WrapAlignment.center,
-                                    spacing: 11,
-                                    runSpacing: 13,
-                                    children: dummyVolunteer.map((item) {
-                                      return Container(
-                                        width: 180,
-                                        child: buildOrganizationCard(
-                                          Icons.ac_unit,
-                                          item.name,
-                                          item.campaigns,
-                                          item.imageUrl,
-                                        ),
-                                      );
-                                    }).toList(),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
                       ),
                     ],
                   ),
@@ -325,96 +378,45 @@ class _HomePageState extends State<HomePage> {
                   child: Column(
                     spacing: 12,
                     children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'Vinh danh Tình Nguyện Viên',
-                            style: GoogleFonts.interTight(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
-                            ),
-                          ),
-
-                          InkWell(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) {
-                                    return VolunteerHonor();
-                                  },
-                                ),
-                              );
-                            },
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  'Xem tất cả',
-                                  style: GoogleFonts.interTight(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(0xff008080),
-                                  ),
-                                ),
-                                Icon(
-                                  Icons.chevron_right,
-                                  color: Color(0xff008080),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
+                      Text(
+                        'Vinh danh Tình Nguyện Viên',
+                        style: GoogleFonts.roboto(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
                       ),
 
                       Container(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            InkWell(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) {
-                                      return VolunteerHonor();
+                        width: double.infinity,
+                        height: 290,
+                        child: _isLoadingVolunteers
+                            ? Center(
+                                child: CircularProgressIndicator(
+                                  color: primaryColor,
+                                ),
+                              )
+                            : _topVolunteers.isEmpty
+                                ? Center(
+                                    child: Text(
+                                      'Chưa có dữ liệu',
+                                      style: GoogleFonts.inter(
+                                        fontSize: 14,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                                  )
+                                : ListView.builder(
+                                    physics: NeverScrollableScrollPhysics(),
+                                    itemCount: _topVolunteers.length,
+                                    itemBuilder: (context, index) {
+                                      final volunteer = _topVolunteers[index];
+                                      return buildVolunteerHonorCard(
+                                        volunteer,
+                                        rank: index + 1,
+                                      );
                                     },
                                   ),
-                                );
-                              },
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.transparent,
-                                  // color: Colors.red,
-                                ),
-                                width: double.infinity,
-                                height: 260,
-                                child: SingleChildScrollView(
-                                  padding: EdgeInsets.symmetric(vertical: 10.0),
-                                  child: Wrap(
-                                    alignment: WrapAlignment.center,
-                                    spacing: 11,
-                                    runSpacing: 13,
-                                    children: dummyVolunteer.map((item) {
-                                      return Container(
-                                        width: 180,
-                                        child: buildOrganizationCard(
-                                          Icons.ac_unit,
-                                          item.name,
-                                          item.campaigns,
-                                          item.imageUrl,
-                                        ),
-                                      );
-                                    }).toList(),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
                       ),
                     ],
                   ),
@@ -478,23 +480,49 @@ class _HomePageState extends State<HomePage> {
 
                     const SizedBox(height: 16),
 
-                    buildBlogItem(
-                      //  thay băng url sau khi dua len cloudinary
-                      imageUrl:
-                          'https://images.unsplash.com/photo-1600818272779-cfa6145222f0?fit=crop&w=200',
-                      title: 'Volunteer Impact Report 2024',
-                      desc: 'See how volunteers made a difference this year',
-                      time: '2 hours ago',
-                    ),
-                    const SizedBox(height: 12),
-
-                    buildBlogItem(
-                      imageUrl:
-                          'https://images.unsplash.com/photo-1600818272779-cfa6145222f0?fit=crop&w=200',
-                      title: 'Community Garden Project Launch',
-                      desc: 'New initiative to create green spaces',
-                      time: '1 day ago',
-                    ),
+                    _isLoadingBlogs
+                        ? Center(
+                            child: CircularProgressIndicator(
+                              color: primaryColor,
+                            ),
+                          )
+                        : _topBlogs.isEmpty
+                            ? Center(
+                                child: Text(
+                                  'Chưa có dữ liệu',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 14,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                              )
+                            : Column(
+                                children: _topBlogs.map((blog) {
+                                  return Column(
+                                    children: [
+                                      InkWell(
+                                        onTap: () {
+                                          // Navigate to blog detail (chưa có page)
+                                          // Navigator.push(context, MaterialPageRoute(
+                                          //   builder: (context) => BlogDetailPage(blogId: blog.id),
+                                          // ));
+                                        },
+                                        child: buildBlogItem(
+                                          imageUrl: blog.coverImage ??
+                                              'https://images.unsplash.com/photo-1600818272779-cfa6145222f0?fit=crop&w=200',
+                                          title: blog.title,
+                                          desc: blog.content != null && blog.content!.length > 100
+                                              ? '${blog.content!.substring(0, 100)}...'
+                                              : blog.content ?? 'Chưa có mô tả',
+                                          time: _formatTime(blog.createdAt),
+                                        ),
+                                      ),
+                                      if (blog != _topBlogs.last)
+                                        const SizedBox(height: 12),
+                                    ],
+                                  );
+                                }).toList(),
+                              ),
                   ],
                 ),
               ),
@@ -503,6 +531,28 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
     );
+  }
+
+  // --- Helper Methods ---
+
+  String _formatTime(String dateTimeStr) {
+    try {
+      final dateTime = DateTime.parse(dateTimeStr);
+      final now = DateTime.now();
+      final difference = now.difference(dateTime);
+
+      if (difference.inMinutes < 60) {
+        return '${difference.inMinutes} phút trước';
+      } else if (difference.inHours < 24) {
+        return '${difference.inHours} giờ trước';
+      } else if (difference.inDays < 7) {
+        return '${difference.inDays} ngày trước';
+      } else {
+        return '${dateTime.day}/${dateTime.month}/${dateTime.year}';
+      }
+    } catch (e) {
+      return 'Vừa xong';
+    }
   }
 
   // --- Helper Widgets để code gọn hơn ---
