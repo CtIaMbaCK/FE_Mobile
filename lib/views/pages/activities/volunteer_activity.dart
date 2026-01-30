@@ -143,31 +143,42 @@ class _VolunteerActivityPageState extends State<VolunteerActivityPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FCFC),
+      backgroundColor: Colors.grey[50],
       body: SafeArea(
         child: Column(
           children: [
-            // Nút "Hoạt động đã đăng ký"
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+            // Header với nút "Hoạt động đã đăng ký"
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.05),
+                    blurRadius: 10,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
               child: SizedBox(
                 width: double.infinity,
-                height: 48,
-                child: OutlinedButton(
+                child: ElevatedButton.icon(
                   onPressed: _onRegisteredActivitiesPressed,
-                  style: OutlinedButton.styleFrom(
-                    backgroundColor: const Color(0xFFF8FCFC),
-                    foregroundColor: const Color(0xFF008080),
-                    side: const BorderSide(color: Color(0xFF008080)),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  child: const Text(
+                  icon: const Icon(Icons.checklist_rounded, size: 20),
+                  label: const Text(
                     'Các hoạt động đã đăng ký',
                     style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF008080),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
                     ),
                   ),
                 ),
@@ -176,24 +187,33 @@ class _VolunteerActivityPageState extends State<VolunteerActivityPage>
 
             // TabBar
             Padding(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
               child: Container(
+                padding: const EdgeInsets.all(4),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFE0F7F7),
+                  color: Colors.grey[200],
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: TabBar(
                   controller: _tabController,
                   indicator: BoxDecoration(
                     color: const Color(0xFF008080),
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(10),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF008080).withValues(alpha: 0.3),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
                   ),
                   labelColor: Colors.white,
-                  unselectedLabelColor: const Color(0xFF004B4B),
+                  unselectedLabelColor: Colors.grey[700],
                   labelStyle: const TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
                   ),
+                  dividerColor: Colors.transparent,
                   tabs: const [
                     Tab(text: 'Yêu cầu trợ giúp'),
                     Tab(text: 'Chiến dịch'),
@@ -231,11 +251,34 @@ class _VolunteerActivityPageState extends State<VolunteerActivityPage>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.inbox, size: 80, color: Colors.grey[400]),
-            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: const Color(0xFF008080).withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.inbox_outlined,
+                size: 64,
+                color: const Color(0xFF008080).withValues(alpha: 0.5),
+              ),
+            ),
+            const SizedBox(height: 20),
             Text(
               'Chưa có yêu cầu nào',
-              style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: Colors.grey[700],
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Các yêu cầu trợ giúp sẽ hiện ở đây',
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.grey[500],
+              ),
             ),
           ],
         ),
@@ -265,11 +308,34 @@ class _VolunteerActivityPageState extends State<VolunteerActivityPage>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.campaign, size: 80, color: Colors.grey[400]),
-            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: Colors.orange.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.campaign_outlined,
+                size: 64,
+                color: Colors.orange.withValues(alpha: 0.5),
+              ),
+            ),
+            const SizedBox(height: 20),
             Text(
               'Chưa có chiến dịch nào',
-              style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: Colors.grey[700],
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Các chiến dịch tình nguyện sẽ hiện ở đây',
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.grey[500],
+              ),
             ),
           ],
         ),
@@ -290,92 +356,144 @@ class _VolunteerActivityPageState extends State<VolunteerActivityPage>
   }
 
   Widget _buildRequestCard(HelpRequestModel request) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: InkWell(
-        onTap: () => _onRequestCardPressed(request),
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Tag + Title
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: request.urgencyLevel == 'CRITICAL'
-                          ? Colors.red
-                          : const Color(0xFF008080),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      request.urgencyLevel == 'CRITICAL'
-                          ? 'KHẨN CẤP'
-                          : 'YÊU CẦU',
-                      style: const TextStyle(
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.08),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () => _onRequestCardPressed(request),
+          borderRadius: BorderRadius.circular(16),
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Urgency badge
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: request.urgencyLevel == 'CRITICAL'
+                        ? Colors.red
+                        : const Color(0xFF008080),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        request.urgencyLevel == 'CRITICAL'
+                            ? Icons.warning_rounded
+                            : Icons.help_outline_rounded,
+                        size: 14,
                         color: Colors.white,
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        request.urgencyLevel == 'CRITICAL'
+                            ? 'KHẨN CẤP'
+                            : 'YÊU CẦU',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                // Title
+                Text(
+                  request.title,
+                  style: const TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.bold,
+                    height: 1.3,
+                  ),
+                ),
+                const SizedBox(height: 12),
+
+                // Location
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        color: Colors.orange.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Icon(
+                        Icons.location_on,
+                        size: 16,
+                        color: Colors.orange,
                       ),
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-
-              Text(
-                request.title,
-                style: const TextStyle(
-                  fontSize: 17,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const SizedBox(height: 8),
-
-              // Location
-              Row(
-                children: [
-                  const Icon(Icons.location_on, size: 16, color: Colors.orange),
-                  const SizedBox(width: 4),
-                  Expanded(
-                    child: Text(
-                      '${request.addressDetail}, ${_getDistrictName(request.district)}',
-                      style: const TextStyle(fontSize: 13, color: Colors.black87),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        '${request.addressDetail}, ${_getDistrictName(request.district)}',
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: Colors.grey[700],
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
+                  ],
+                ),
+                const SizedBox(height: 12),
 
-              // Info row
-              Row(
-                children: [
-                  const Icon(Icons.category, size: 16, color: Colors.blue),
-                  const SizedBox(width: 4),
-                  Text(
-                    _getActivityTypeName(request.activityType),
-                    style: const TextStyle(fontSize: 12, color: Colors.blue),
+                // Info row
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[100],
+                    borderRadius: BorderRadius.circular(12),
                   ),
-                  const SizedBox(width: 16),
-                  const Icon(Icons.schedule, size: 16, color: Colors.purple),
-                  const SizedBox(width: 4),
-                  Text(
-                    _formatDateTime(request.startDate, request.startTime),
-                    style: const TextStyle(fontSize: 12),
+                  child: Row(
+                    children: [
+                      Icon(Icons.category, size: 16, color: Colors.grey[600]),
+                      const SizedBox(width: 6),
+                      Text(
+                        _getActivityTypeName(request.activityType),
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey[700],
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const Spacer(),
+                      Icon(Icons.schedule, size: 16, color: Colors.grey[600]),
+                      const SizedBox(width: 6),
+                      Text(
+                        _formatDateTime(request.startDate, request.startTime),
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey[700],
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-            ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -385,132 +503,233 @@ class _VolunteerActivityPageState extends State<VolunteerActivityPage>
   Widget _buildCampaignCard(CampaignModel campaign) {
     final spotsLeft = campaign.maxVolunteers - campaign.currentVolunteers;
 
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: InkWell(
-        onTap: () => _onCampaignCardPressed(campaign),
-        borderRadius: BorderRadius.circular(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Cover image
-            if (campaign.coverImage != null)
-              ClipRRect(
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
-                child: Image.network(
-                  campaign.coverImage!,
-                  width: double.infinity,
-                  height: 150,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) => Container(
-                    height: 150,
-                    color: Colors.grey[300],
-                    child: const Icon(Icons.campaign, size: 50),
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.08),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () => _onCampaignCardPressed(campaign),
+          borderRadius: BorderRadius.circular(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Cover image với gradient overlay
+              if (campaign.coverImage != null)
+                ClipRRect(
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                  child: Stack(
+                    children: [
+                      Image.network(
+                        campaign.coverImage!,
+                        width: double.infinity,
+                        height: 180,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) => Container(
+                          height: 180,
+                          decoration: BoxDecoration(
+                            color: Colors.grey[300],
+                          ),
+                          child: const Icon(
+                            Icons.campaign,
+                            size: 50,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      ),
+                      // Gradient overlay
+                      Container(
+                        height: 180,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              Colors.transparent,
+                              Colors.black.withValues(alpha: 0.3),
+                            ],
+                          ),
+                        ),
+                      ),
+                      // Campaign badge
+                      Positioned(
+                        top: 12,
+                        left: 12,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 6,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.orange,
+                            borderRadius: BorderRadius.circular(20),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.2),
+                                blurRadius: 4,
+                              ),
+                            ],
+                          ),
+                          child: const Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.campaign,
+                                size: 14,
+                                color: Colors.white,
+                              ),
+                              SizedBox(width: 4),
+                              Text(
+                                'CHIẾN DỊCH',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ),
 
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Tag
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.orange,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: const Text(
-                      'CHIẾN DỊCH',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 10,
+              Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Title
+                    Text(
+                      campaign.title,
+                      style: const TextStyle(
+                        fontSize: 17,
                         fontWeight: FontWeight.bold,
+                        height: 1.3,
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 8),
+                    const SizedBox(height: 12),
 
-                  // Title
-                  Text(
-                    campaign.title,
-                    style: const TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
+                    // Organization
+                    if (campaign.organization != null)
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(6),
+                            decoration: BoxDecoration(
+                              color: Colors.grey[200],
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Icon(
+                              Icons.business,
+                              size: 16,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              campaign.organization!.organizationName ?? 'Tổ chức xã hội',
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: Colors.grey[700],
+                                fontWeight: FontWeight.w500,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                    const SizedBox(height: 12),
 
-                  // Organization
-                  if (campaign.organization != null)
+                    // Location
                     Row(
                       children: [
-                        const Icon(Icons.business, size: 16, color: Colors.grey),
-                        const SizedBox(width: 4),
+                        Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: Colors.orange.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Icon(
+                            Icons.location_on,
+                            size: 16,
+                            color: Colors.orange,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
                         Expanded(
                           child: Text(
-                            campaign.organization!.organizationName ?? 'Tổ chức xã hội',
-                            style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                            '${campaign.addressDetail}, ${_getDistrictName(campaign.district)}',
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: Colors.grey[700],
+                            ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
                       ],
                     ),
-                  const SizedBox(height: 8),
+                    const SizedBox(height: 16),
 
-                  // Location
-                  Row(
-                    children: [
-                      const Icon(Icons.location_on, size: 16, color: Colors.orange),
-                      const SizedBox(width: 4),
-                      Expanded(
-                        child: Text(
-                          '${campaign.addressDetail}, ${_getDistrictName(campaign.district)}',
-                          style: const TextStyle(fontSize: 13),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
+                    // Info row
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[100],
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-
-                  // Info row
-                  Row(
-                    children: [
-                      const Icon(Icons.people, size: 16, color: Colors.green),
-                      const SizedBox(width: 4),
-                      Text(
-                        '${campaign.currentVolunteers}/${campaign.maxVolunteers} TNV (còn $spotsLeft chỗ)',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: spotsLeft > 0 ? Colors.green : Colors.red,
-                          fontWeight: FontWeight.w500,
-                        ),
+                      child: Row(
+                        children: [
+                          Icon(Icons.people, size: 18, color: spotsLeft > 0 ? Colors.green : Colors.red),
+                          const SizedBox(width: 6),
+                          Text(
+                            '${campaign.currentVolunteers}/${campaign.maxVolunteers}',
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: spotsLeft > 0 ? Colors.green : Colors.red,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Text(
+                            ' TNV',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                          const Spacer(),
+                          Icon(Icons.calendar_today, size: 16, color: Colors.grey[600]),
+                          const SizedBox(width: 6),
+                          Text(
+                            _formatDate(campaign.startDate),
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey[700],
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
                       ),
-                      const SizedBox(width: 16),
-                      const Icon(Icons.calendar_today, size: 16, color: Colors.blue),
-                      const SizedBox(width: 4),
-                      Expanded(
-                        child: Text(
-                          _formatDate(campaign.startDate),
-                          style: const TextStyle(fontSize: 12),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

@@ -75,12 +75,23 @@ class OrganizationService {
   // Lấy top organizations (chỉ ACTIVE, cho home page)
   Future<List<OrganizationModel>> getTopOrganizations({int limit = 5}) async {
     try {
-      final response = await getOrganizations(
-        status: 'ACTIVE',
-        page: 1,
-        limit: limit,
+      // Sử dụng public API không cần token
+      final uri = Uri.parse('$baseUrl/public-statistics/top-organizations')
+          .replace(queryParameters: {'limit': limit.toString()});
+
+      final response = await http.get(
+        uri,
+        headers: {
+          'Content-Type': 'application/json',
+          'ngrok-skip-browser-warning': 'true',
+        },
       );
-      return response?.items ?? [];
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = jsonDecode(response.body);
+        return data.map((item) => OrganizationModel.fromTopOrgJson(item)).toList();
+      }
+      return [];
     } catch (e) {
       print('Error fetching top organizations: $e');
       return [];

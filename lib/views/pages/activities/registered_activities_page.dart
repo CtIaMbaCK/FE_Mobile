@@ -78,9 +78,17 @@ class _RegisteredActivitiesPageState extends State<RegisteredActivitiesPage>
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => RequestDetailPage(request: request),
+        builder: (context) => RequestDetailPage(
+          request: request,
+          isVolunteerView: true, // TNV đang xem request đã nhận
+        ),
       ),
-    );
+    ).then((value) {
+      if (value == true) {
+        setState(() => _hasChanges = true);
+        _loadAcceptedRequests(); // Reload list khi hoàn thành
+      }
+    });
   }
 
   void _onCampaignCardPressed(CampaignModel campaign) {

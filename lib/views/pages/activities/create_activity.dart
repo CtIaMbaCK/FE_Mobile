@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'dart:io';
 import 'package:mobile/models/request_model.dart';
 import 'package:mobile/services/request_service.dart';
+import 'package:mobile/services/cloudinary_service.dart';
 
 class NewHelpPage extends StatefulWidget {
   final HelpRequestModel? request; // Nhận dữ liệu nếu là chỉnh sửa
@@ -17,6 +18,7 @@ class NewHelpPage extends StatefulWidget {
 class _NewHelpPageState extends State<NewHelpPage> {
   final _formKey = GlobalKey<FormState>();
   final RequestService _requestService = RequestService();
+  final CloudinaryService _cloudinaryService = CloudinaryService();
   final ImagePicker _picker = ImagePicker();
 
   // --- Controllers ---
@@ -160,6 +162,79 @@ class _NewHelpPageState extends State<NewHelpPage> {
       return;
     }
 
+    // Hiển thị loading dialog đẹp hơn
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        child: Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const CircularProgressIndicator(
+                color: Color(0xFF008080),
+              ),
+              const SizedBox(height: 20),
+              const Text(
+                'Đang tải ảnh lên...',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black87,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Vui lòng đợi một chút',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey[600],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    // Upload ảnh lên Cloudinary nếu có ảnh mới được chọn
+    List<String> activityImages = [];
+
+    if (_selectedImages.isNotEmpty) {
+      print('📤 Bắt đầu upload ${_selectedImages.length} ảnh...');
+      activityImages = await _cloudinaryService.uploadMultipleImages(_selectedImages);
+
+      if (activityImages.isEmpty) {
+        Navigator.pop(context); // Đóng loading
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Lỗi khi tải ảnh lên. Vui lòng thử lại!"),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return;
+      }
+    } else if (_existingImageUrls.isNotEmpty) {
+      // Sử dụng ảnh cũ nếu là chỉnh sửa và không chọn ảnh mới
+      activityImages = _existingImageUrls;
+    } else {
+      // Không có ảnh nào
+      Navigator.pop(context); // Đóng loading
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Vui lòng chọn ít nhất 1 ảnh!"),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
+
     final Map<String, dynamic> body = {
       "title": _titleController.text,
       "activityType": _selectedHelpType,
@@ -171,18 +246,10 @@ class _NewHelpPageState extends State<NewHelpPage> {
       "startTime": _combineDateTime(_startDate!, _startTime!),
       "endTime": _combineDateTime(_endDate!, _endTime!),
       "recurrence": _selectedRecurrence,
-      "activityImages": _existingImageUrls.isNotEmpty
-          ? _existingImageUrls
-          : [
-              "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSbj_SXUeWP4_QMm_Q0B0lmBfze8BiAQhCTmg&s",
-            ],
+      "activityImages": activityImages,
     };
 
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => const Center(child: CircularProgressIndicator()),
-    );
+    print('📝 Tạo request với ${activityImages.length} ảnh');
 
     bool success;
     if (widget.request != null) {
@@ -194,10 +261,23 @@ class _NewHelpPageState extends State<NewHelpPage> {
     Navigator.pop(context); // Tắt loading
 
     if (success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            widget.request != null
+                ? 'Cập nhật yêu cầu thành công!'
+                : 'Tạo yêu cầu thành công!',
+          ),
+          backgroundColor: Colors.green,
+        ),
+      );
       Navigator.pop(context, true);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Lỗi thao tác, vui lòng kiểm tra lại")),
+        const SnackBar(
+          content: Text("Lỗi thao tác, vui lòng kiểm tra lại"),
+          backgroundColor: Colors.red,
+        ),
       );
     }
   }

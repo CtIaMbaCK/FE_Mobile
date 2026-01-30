@@ -229,4 +229,40 @@ class RequestService {
       return [];
     }
   }
+
+  /// Cập nhật trạng thái request khi TNV hoàn thành (upload proof images)
+  Future<bool> completeRequest({
+    required String requestId,
+    required List<String> proofImages,
+    String? completionNotes,
+  }) async {
+    try {
+      String? token = await _authService.getToken();
+
+      final response = await http.patch(
+        Uri.parse('$baseUrl/request/$requestId/status'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+          'ngrok-skip-browser-warning': 'true',
+        },
+        body: jsonEncode({
+          'proofImages': proofImages,
+          if (completionNotes != null && completionNotes.isNotEmpty)
+            'completionNotes': completionNotes,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        print('✅ Hoàn thành request thành công');
+        return true;
+      } else {
+        print('❌ Lỗi complete request: ${response.statusCode} - ${response.body}');
+        return false;
+      }
+    } catch (e) {
+      print('❌ Lỗi kết nối API completeRequest: $e');
+      return false;
+    }
+  }
 }

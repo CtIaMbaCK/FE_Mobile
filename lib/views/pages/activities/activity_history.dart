@@ -1,8 +1,9 @@
 // lib/views/pages/activities/activity_history.dart
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:mobile/models/request_model.dart';
 import 'package:mobile/services/request_service.dart';
+import 'package:mobile/views/pages/activities/request_result_page.dart';
+import 'package:mobile/views/pages/activities/request_detail_page.dart';
 import 'package:intl/intl.dart';
 
 class HistoryActivityPage extends StatefulWidget {
@@ -46,20 +47,20 @@ class _HistoryActivityPageState extends State<HistoryActivityPage>
     if (_tabController == null) return const Scaffold();
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF1F4F8),
+      backgroundColor: Colors.grey[50],
       appBar: AppBar(
-        backgroundColor: const Color(0xFFF1F4F8),
+        backgroundColor: const Color(0xFF008080),
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded, color: Color(0xFF15161E)),
+          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Text(
+        title: const Text(
           'Lịch sử hoạt động',
-          style: GoogleFonts.readexPro(
-            color: const Color(0xFF15161E),
-            fontSize: 20,
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -97,17 +98,39 @@ class _HistoryActivityPageState extends State<HistoryActivityPage>
 
             // --- Tab Bar ---
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: TabBar(
-                controller: _tabController,
-                indicatorColor: const Color(0xFF008080),
-                labelColor: const Color(0xFF008080),
-                unselectedLabelColor: Colors.grey,
-                tabs: const [
-                  Tab(text: 'Tất cả'),
-                  Tab(text: 'Hoàn thành'),
-                  Tab(text: 'Từ chối'),
-                ],
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
+              child: Container(
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: Colors.grey[200],
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: TabBar(
+                  controller: _tabController,
+                  indicator: BoxDecoration(
+                    color: const Color(0xFF008080),
+                    borderRadius: BorderRadius.circular(10),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF008080).withValues(alpha: 0.3),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  labelColor: Colors.white,
+                  unselectedLabelColor: Colors.grey[700],
+                  labelStyle: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  dividerColor: Colors.transparent,
+                  tabs: const [
+                    Tab(text: 'Tất cả'),
+                    Tab(text: 'Hoàn thành'),
+                    Tab(text: 'Từ chối'),
+                  ],
+                ),
               ),
             ),
 
@@ -156,42 +179,50 @@ class _HistoryActivityPageState extends State<HistoryActivityPage>
 
     switch (item.status) {
       case 'PENDING':
-        statusBg = const Color(0xFFFEF3C7);
-        statusText = const Color(0xFF8D3100);
+        statusBg = Colors.orange;
+        statusText = Colors.white;
         label = "Chờ duyệt";
         break;
       case 'APPROVED':
-        statusBg = const Color(0xFFE0F2FE);
-        statusText = const Color(0xFF0369A1);
+        statusBg = Colors.blue;
+        statusText = Colors.white;
         label = "Đã duyệt";
         break;
       case 'ONGOING':
-        statusBg = const Color(0xFFDCFCE7);
-        statusText = const Color(0xFF15803D);
-        label = "Đang diễn ra";
+        statusBg = Colors.purple;
+        statusText = Colors.white;
+        label = "Đang thực hiện";
         break;
       case 'COMPLETED':
-        statusBg = const Color(0xFFE0F2F1);
-        statusText = const Color(0xFF008080);
+        statusBg = Colors.green;
+        statusText = Colors.white;
         label = "Hoàn thành";
         break;
       case 'REJECTED':
-        statusBg = const Color(0xFFFFE4E6);
-        statusText = const Color(0xFFCC4362);
+        statusBg = Colors.red;
+        statusText = Colors.white;
         label = "Từ chối";
         break;
       default:
-        statusBg = Colors.grey[200]!;
-        statusText = Colors.black54;
+        statusBg = Colors.grey;
+        statusText = Colors.white;
         label = item.status;
     }
 
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      color: Colors.white,
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.08),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -200,60 +231,109 @@ class _HistoryActivityPageState extends State<HistoryActivityPage>
               children: [
                 Container(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 4,
+                    horizontal: 12,
+                    vertical: 6,
                   ),
                   decoration: BoxDecoration(
                     color: statusBg,
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
                     label,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       color: statusText,
                       fontWeight: FontWeight.bold,
                       fontSize: 12,
                     ),
                   ),
                 ),
-                Text(
-                  DateFormat('dd/MM/yyyy').format(item.createdAt),
-                  style: const TextStyle(fontSize: 12, color: Colors.grey),
+                Row(
+                  children: [
+                    Icon(
+                      Icons.calendar_today,
+                      size: 14,
+                      color: Colors.grey[500],
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      DateFormat('dd/MM/yyyy').format(item.createdAt),
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey[600],
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 16),
             Text(
               item.title,
-              style: GoogleFonts.interTight(
+              style: const TextStyle(
                 fontSize: 17,
                 fontWeight: FontWeight.bold,
+                height: 1.3,
               ),
             ),
-            const SizedBox(height: 8),
-            Text(
-              item.description ?? "Không có mô tả",
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(color: Color(0xFF57636C)),
-            ),
+            const SizedBox(height: 12),
+            if (item.description != null && item.description!.isNotEmpty)
+              Text(
+                item.description!,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey[700],
+                  height: 1.5,
+                ),
+              ),
             const SizedBox(height: 16),
             SizedBox(
               width: double.infinity,
-              height: 40,
-              child: ElevatedButton(
-                onPressed: () => print('ID: ${item.id}'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF008080).withOpacity(0.1),
-                  foregroundColor: const Color(0xFF008080),
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+              child: OutlinedButton.icon(
+                onPressed: () {
+                  // Nếu là COMPLETED, xem kết quả với form đánh giá
+                  // Các status khác xem chi tiết thông tin request
+                  if (item.status == 'COMPLETED') {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => RequestResultPage(request: item),
+                      ),
+                    );
+                  } else {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => RequestDetailPage(request: item),
+                      ),
+                    );
+                  }
+                },
+                icon: Icon(
+                  item.status == 'COMPLETED'
+                    ? Icons.visibility_outlined
+                    : Icons.info_outline,
+                  size: 18,
+                ),
+                label: Text(
+                  item.status == 'COMPLETED' ? 'Xem kết quả' : 'Xem chi tiết',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
                   ),
                 ),
-                child: const Text(
-                  'Xem chi tiết',
-                  style: TextStyle(fontWeight: FontWeight.w600),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: const Color(0xFF008080),
+                  side: const BorderSide(
+                    color: Color(0xFF008080),
+                    width: 1.5,
+                  ),
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
               ),
             ),

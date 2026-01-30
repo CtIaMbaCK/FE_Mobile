@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:mobile/models/request_model.dart';
 import 'package:mobile/services/request_service.dart';
+import 'package:mobile/views/pages/activities/request_detail_page.dart';
 
 class MapRequestsPage extends StatefulWidget {
   const MapRequestsPage({Key? key}) : super(key: key);
@@ -11,13 +12,16 @@ class MapRequestsPage extends StatefulWidget {
   State<MapRequestsPage> createState() => _MapRequestsPageState();
 }
 
-class _MapRequestsPageState extends State<MapRequestsPage> {
-  final Completer<GoogleMapController> _controller = Completer();
+class _MapRequestsPageState extends State<MapRequestsPage>
+    with WidgetsBindingObserver {
+  GoogleMapController? _mapController;
   final RequestService _requestService = RequestService();
 
   Set<Marker> _markers = {};
   List<HelpRequestModel> _requests = [];
   bool _isLoading = true;
+  Timer? _autoRefreshTimer;
+  DateTime? _lastRefreshTime;
 
   // Vị trí mặc định: TP. Hồ Chí Minh
   static const CameraPosition _initialPosition = CameraPosition(
@@ -28,11 +32,54 @@ class _MapRequestsPageState extends State<MapRequestsPage> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _loadRequests();
+    _startAutoRefresh();
   }
 
-  Future<void> _loadRequests() async {
-    setState(() => _isLoading = true);
+  @override
+  void dispose() {
+    _autoRefreshTimer?.cancel();
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+
+    if (state == AppLifecycleState.resumed) {
+      // App quay lại foreground → Kiểm tra và refresh nếu cần
+      _checkAndRefresh();
+    } else if (state == AppLifecycleState.paused) {
+      // App vào background → Dừng auto refresh để tiết kiệm pin
+      _autoRefreshTimer?.cancel();
+    }
+  }
+
+  /// Auto refresh mỗi 30 giây
+  void _startAutoRefresh() {
+    _autoRefreshTimer?.cancel();
+    _autoRefreshTimer = Timer.periodic(
+      const Duration(seconds: 30),
+      (_) => _loadRequests(showLoading: false),
+    );
+  }
+
+  /// Kiểm tra và refresh nếu quá lâu không update
+  void _checkAndRefresh() {
+    if (_lastRefreshTime == null ||
+        DateTime.now().difference(_lastRefreshTime!) >
+            const Duration(minutes: 2)) {
+      _loadRequests();
+      _startAutoRefresh(); // Restart timer khi app resume
+    }
+  }
+
+  Future<void> _loadRequests({bool showLoading = true}) async {
+    if (showLoading) {
+      setState(() => _isLoading = true);
+    }
 
     try {
       final requests = await _requestService.getPendingRequests();
@@ -42,284 +89,104 @@ class _MapRequestsPageState extends State<MapRequestsPage> {
           .where((r) => r.latitude != null && r.longitude != null)
           .toList();
 
+      print('=== DEBUG MAP ===');
+      print('Total requests from API: ${requests.length}');
+      print('Valid requests (có tọa độ): ${validRequests.length}');
+
       // Tạo markers
       final markers = <Marker>{};
       for (var request in validRequests) {
+        print(
+            'Adding marker: ${request.id} - ${request.title} - (${request.latitude}, ${request.longitude})');
         markers.add(
           Marker(
             markerId: MarkerId(request.id),
             position: LatLng(request.latitude!, request.longitude!),
             onTap: () => _onMarkerTapped(request),
             icon: BitmapDescriptor.defaultMarkerWithHue(
-              BitmapDescriptor.hueRed,
+              request.urgencyLevel == 'CRITICAL'
+                  ? BitmapDescriptor.hueRed
+                  : BitmapDescriptor.hueOrange,
             ),
             infoWindow: InfoWindow(
               title: request.title,
-              snippet: 'Nhấn để xem chi tiết',
+              snippet: request.urgencyLevel == 'CRITICAL'
+                  ? '🚨 Khẩn cấp - Nhấn để xem'
+                  : 'Nhấn để xem chi tiết',
             ),
           ),
         );
       }
 
-      setState(() {
-        _requests = validRequests;
-        _markers = markers;
-        _isLoading = false;
-      });
+      print('Total markers created: ${markers.length}');
+      print('==================');
+
+      if (mounted) {
+        setState(() {
+          _requests = validRequests;
+          _markers = markers;
+          _isLoading = false;
+          _lastRefreshTime = DateTime.now();
+        });
+
+        // Hiển thị toast nếu có yêu cầu mới (chỉ khi background refresh)
+        if (!showLoading && validRequests.length != _requests.length) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Có ${validRequests.length} yêu cầu mới'),
+              duration: const Duration(seconds: 2),
+              behavior: SnackBarBehavior.floating,
+              backgroundColor: Colors.blue,
+            ),
+          );
+        }
+      }
     } catch (e) {
       print('Lỗi load requests: $e');
-      setState(() => _isLoading = false);
+      if (mounted) {
+        setState(() => _isLoading = false);
+
+        // Chỉ hiển thị error nếu là manual refresh
+        if (showLoading) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Không thể tải dữ liệu: ${e.toString()}'),
+              backgroundColor: Colors.red,
+              duration: const Duration(seconds: 3),
+            ),
+          );
+        }
+      }
     }
   }
 
   void _onMarkerTapped(HelpRequestModel request) {
-    _showRequestDetail(request);
-  }
-
-  void _showRequestDetail(HelpRequestModel request) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => RequestDetailPage(
+          request: request,
+          isVolunteerView: false, // Chưa nhận, đang xem từ map
+        ),
       ),
-      builder: (context) => _buildRequestDetailSheet(request),
-    );
-  }
-
-  Widget _buildRequestDetailSheet(HelpRequestModel request) {
-    return DraggableScrollableSheet(
-      initialChildSize: 0.6,
-      minChildSize: 0.4,
-      maxChildSize: 0.9,
-      expand: false,
-      builder: (context, scrollController) {
-        return Container(
-          padding: const EdgeInsets.all(20),
-          child: ListView(
-            controller: scrollController,
-            children: [
-              // Thanh kéo
-              Center(
-                child: Container(
-                  width: 40,
-                  height: 4,
-                  margin: const EdgeInsets.only(bottom: 20),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[300],
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-              ),
-
-              // Tiêu đề
-              Text(
-                request.title,
-                style: const TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              // Mức độ khẩn cấp
-              _buildInfoRow(
-                Icons.warning_amber_rounded,
-                'Mức độ',
-                request.urgencyLevel == 'CRITICAL' ? 'Khẩn cấp' : 'Bình thường',
-                request.urgencyLevel == 'CRITICAL' ? Colors.red : Colors.green,
-              ),
-
-              // Loại hoạt động
-              _buildInfoRow(
-                Icons.category,
-                'Loại hoạt động',
-                _getActivityTypeName(request.activityType),
-                Colors.blue,
-              ),
-
-              // Địa chỉ
-              _buildInfoRow(
-                Icons.location_on,
-                'Địa chỉ',
-                '${request.addressDetail}, ${_getDistrictName(request.district)}',
-                Colors.orange,
-              ),
-
-              // Thời gian
-              _buildInfoRow(
-                Icons.access_time,
-                'Thời gian',
-                _formatDateTime(request.startDate, request.startTime),
-                Colors.purple,
-              ),
-
-              // Mô tả
-              if (request.description != null && request.description!.isNotEmpty) ...[
-                const SizedBox(height: 16),
-                const Text(
-                  'Mô tả',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  request.description!,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey[700],
-                  ),
-                ),
-              ],
-
-              const SizedBox(height: 24),
-
-              // Nút chấp nhận
-              SizedBox(
-                width: double.infinity,
-                height: 50,
-                child: ElevatedButton(
-                  onPressed: () => _acceptRequest(request),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  child: const Text(
-                    'Chấp nhận yêu cầu',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildInfoRow(IconData icon, String label, String value, Color color) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(icon, size: 20, color: color),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  label,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey[600],
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  value,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Future<void> _acceptRequest(HelpRequestModel request) async {
-    // Đóng bottom sheet
-    Navigator.pop(context);
-
-    // Hiển thị loading
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => const Center(
-        child: CircularProgressIndicator(),
-      ),
-    );
-
-    try {
-      final success = await _requestService.acceptRequest(request.id);
-
-      // Đóng loading dialog
-      if (mounted) Navigator.pop(context);
-
-      if (success) {
-        // Hiển thị thông báo thành công
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Đã chấp nhận yêu cầu thành công!'),
-              backgroundColor: Colors.green,
-              duration: Duration(seconds: 2),
-            ),
-          );
-        }
-
-        // Reload danh sách để xóa request đã accept khỏi map
-        await _loadRequests();
-      } else {
-        // Hiển thị lỗi
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Không thể chấp nhận yêu cầu. Vui lòng thử lại!'),
-              backgroundColor: Colors.red,
-              duration: Duration(seconds: 3),
-            ),
-          );
-        }
+    ).then((value) {
+      if (value == true) {
+        _loadRequests(); // Reload map khi accept request
       }
-    } catch (e) {
-      // Đóng loading dialog nếu còn mở
-      if (mounted) Navigator.pop(context);
+    });
+  }
 
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Lỗi: $e'),
-            backgroundColor: Colors.red,
-            duration: const Duration(seconds: 3),
-          ),
-        );
-      }
+  String _formatRefreshTime(DateTime time) {
+    final now = DateTime.now();
+    final difference = now.difference(time);
+
+    if (difference.inSeconds < 60) {
+      return 'vừa xong';
+    } else if (difference.inMinutes < 60) {
+      return '${difference.inMinutes} phút trước';
+    } else {
+      return '${time.hour}:${time.minute.toString().padLeft(2, '0')}';
     }
-  }
-
-  String _getActivityTypeName(String type) {
-    const types = {
-      'EDUCATION': 'Giáo dục',
-      'MEDICAL': 'Y tế',
-      'HOUSE_WORK': 'Công việc nhà',
-      'TRANSPORT': 'Đi lại',
-      'FOOD': 'Thực phẩm',
-      'SHELTER': 'Nhà ở',
-      'OTHER': 'Khác',
-    };
-    return types[type] ?? type;
-  }
-
-  String _getDistrictName(String district) {
-    return district.replaceAll('_', ' ').replaceAll('QUAN', 'Quận');
-  }
-
-  String _formatDateTime(DateTime date, DateTime time) {
-    return '${date.day}/${date.month}/${date.year} - ${time.hour}:${time.minute.toString().padLeft(2, '0')}';
   }
 
   @override
@@ -343,7 +210,7 @@ class _MapRequestsPageState extends State<MapRequestsPage> {
                   initialCameraPosition: _initialPosition,
                   markers: _markers,
                   onMapCreated: (GoogleMapController controller) {
-                    _controller.complete(controller);
+                    _mapController = controller;
                   },
                   myLocationEnabled: true,
                   myLocationButtonEnabled: true,
@@ -378,13 +245,45 @@ class _MapRequestsPageState extends State<MapRequestsPage> {
                         const Icon(Icons.info_outline, color: Colors.blue),
                         const SizedBox(width: 8),
                         Text(
-                          'Có ${_requests.length} yêu cầu đang chờ',
+                          'Có ${_markers.length} yêu cầu đang chờ',
                           style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
                       ],
+                    ),
+                  ),
+                ),
+
+                // Last refresh time
+                Positioned(
+                  bottom: 80,
+                  right: 16,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(8),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.1),
+                          blurRadius: 4,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Text(
+                      _lastRefreshTime != null
+                          ? 'Cập nhật: ${_formatRefreshTime(_lastRefreshTime!)}'
+                          : 'Đang tải...',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey[600],
+                      ),
                     ),
                   ),
                 ),

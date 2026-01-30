@@ -75,16 +75,21 @@ class VolunteerService {
   // Lấy top volunteers (theo điểm, cho home page)
   Future<List<VolunteerHonorModel>> getTopVolunteers({int limit = 5}) async {
     try {
-      final response = await getVolunteers(page: 1, limit: limit);
-      if (response != null && response.items.isNotEmpty) {
-        // Sắp xếp theo điểm giảm dần
-        final volunteers = response.items;
-        volunteers.sort((a, b) {
-          final pointsA = a.volunteerProfile?.points ?? 0;
-          final pointsB = b.volunteerProfile?.points ?? 0;
-          return pointsB.compareTo(pointsA);
-        });
-        return volunteers;
+      // Sử dụng public API không cần token
+      final uri = Uri.parse('$baseUrl/public-statistics/top-volunteers')
+          .replace(queryParameters: {'limit': limit.toString()});
+
+      final response = await http.get(
+        uri,
+        headers: {
+          'Content-Type': 'application/json',
+          'ngrok-skip-browser-warning': 'true',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = jsonDecode(response.body);
+        return data.map((item) => VolunteerHonorModel.fromJson(item)).toList();
       }
       return [];
     } catch (e) {

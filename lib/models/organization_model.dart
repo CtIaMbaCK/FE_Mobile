@@ -25,6 +25,27 @@ class OrganizationModel {
     );
   }
 
+  // Factory method cho top organizations từ public API
+  factory OrganizationModel.fromTopOrgJson(Map<String, dynamic> json) {
+    return OrganizationModel(
+      id: json['organizationId'] ?? '',
+      email: '',
+      phoneNumber: '',
+      status: 'ACTIVE',
+      organizationProfiles: OrganizationProfile(
+        organizationName: json['organizationName'] ?? '',
+        avatarUrl: json['avatarUrl'],
+        district: null,
+        addressDetail: json['description'],
+        representativeName: null,
+        establishedYear: null,
+        totalCampaigns: json['completedCampaigns'],
+        totalVolunteers: null,
+        createdAt: null,
+      ),
+    );
+  }
+
   Map<String, dynamic> toJson() {
     return {
       'id': id,

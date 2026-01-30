@@ -12,6 +12,23 @@ class VolunteerHonorModel {
   });
 
   factory VolunteerHonorModel.fromJson(Map<String, dynamic> json) {
+    // Hỗ trợ cả format cũ (admin API) và format mới (public API)
+    if (json['userId'] != null && json['fullName'] != null) {
+      // Format mới từ public API
+      return VolunteerHonorModel(
+        id: json['userId'] ?? '',
+        email: '',
+        phoneNumber: '',
+        volunteerProfile: VolunteerHonorProfile(
+          fullName: json['fullName'] ?? '',
+          avatarUrl: json['avatarUrl'],
+          points: json['points'] ?? 0,
+          skills: null,
+          district: null,
+        ),
+      );
+    }
+    // Format cũ từ admin API
     return VolunteerHonorModel(
       id: json['id'] ?? '',
       email: json['email'] ?? '',
