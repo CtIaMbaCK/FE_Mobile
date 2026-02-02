@@ -7,7 +7,7 @@ import 'package:mobile/views/pages/activities/activity_page.dart';
 import 'package:mobile/views/pages/home/home_page.dart';
 import 'package:mobile/views/pages/emer/main_page.dart';
 import 'package:mobile/views/pages/profile/profile_page.dart';
-import 'package:mobile/views/pages/user_message.dart';
+import 'package:mobile/views/pages/chat/conversation_list_page.dart';
 import 'package:mobile/views/widgets/navbar_widget.dart';
 
 // Biến toàn cục để lưu user hiện tại (Để truy cập ở các trang con)
@@ -18,7 +18,7 @@ List<Widget> pages = [
   const HomePage(),
   const ActivityPage(),
   const MainPage(),
-  const UserMessage(),
+  const ConversationListPage(),
   const ProfilePage(),
 ];
 
