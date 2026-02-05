@@ -23,6 +23,10 @@ class ChatSocketService {
   Function(String userId)? onUserOffline;
   Function(String error)? onError;
 
+  // SOS Emergency callbacks
+  Function(Map<String, dynamic>)? onSOSSent;
+  Function(Map<String, dynamic>)? onSOSAlert;
+
   bool get isConnected => _socket?.connected ?? false;
 
   // Kết nối Socket.io
@@ -150,6 +154,21 @@ class ChatSocketService {
         }
       });
 
+      // SOS Emergency events
+      _socket!.on('sos_sent', (data) {
+        print('🚨 SOS sent confirmation: $data');
+        if (onSOSSent != null) {
+          onSOSSent!(Map<String, dynamic>.from(data));
+        }
+      });
+
+      _socket!.on('sos_alert', (data) {
+        print('🚨 SOS Alert received: $data');
+        if (onSOSAlert != null) {
+          onSOSAlert!(Map<String, dynamic>.from(data));
+        }
+      });
+
     } catch (e) {
       print('Socket connection error: $e');
       if (onError != null) {
@@ -217,6 +236,22 @@ class ChatSocketService {
     });
   }
 
+  // Gửi SOS Emergency
+  void sendSOS({String? notes}) {
+    if (!isConnected) {
+      print('Socket not connected for SOS');
+      if (onError != null) {
+        onError!('Chưa kết nối server');
+      }
+      return;
+    }
+
+    print('🚨 Sending SOS emergency signal...');
+    _socket!.emit('send_sos', {
+      if (notes != null) 'notes': notes,
+    });
+  }
+
   // Clear all callbacks (khi dispose widget)
   void clearCallbacks() {
     onNewMessage = null;
@@ -227,5 +262,7 @@ class ChatSocketService {
     onUserOnline = null;
     onUserOffline = null;
     onError = null;
+    onSOSSent = null;
+    onSOSAlert = null;
   }
 }

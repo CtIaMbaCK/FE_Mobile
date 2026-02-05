@@ -240,14 +240,14 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                  if (_isOtherUserTyping)
-                    const Text(
-                      'Đang nhập...',
-                      style: TextStyle(
-                        color: Colors.white70,
-                        fontSize: 12,
-                      ),
-                    ),
+                  // if (_isOtherUserTyping)
+                  //   const Text(
+                  //     'Đang nhập...',
+                  //     style: TextStyle(
+                  //       color: Colors.white70,
+                  //       fontSize: 12,
+                  //     ),
+                  //   ),
                 ],
               ),
             ),

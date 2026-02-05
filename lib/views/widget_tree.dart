@@ -6,6 +6,7 @@ import 'package:mobile/views/welcome_page.dart'; // Import trang Onboarding
 import 'package:mobile/views/pages/activities/activity_page.dart';
 import 'package:mobile/views/pages/home/home_page.dart';
 import 'package:mobile/views/pages/emer/main_page.dart';
+import 'package:mobile/views/pages/emer/sos_emergency_page.dart';
 import 'package:mobile/views/pages/profile/profile_page.dart';
 import 'package:mobile/views/pages/chat/conversation_list_page.dart';
 import 'package:mobile/views/widgets/navbar_widget.dart';
@@ -14,13 +15,22 @@ import 'package:mobile/views/widgets/navbar_widget.dart';
 // Bạn nên để cái này trong một file riêng như user_manager.dart hoặc trong notifiers.dart
 UserModel? currentUser;
 
-List<Widget> pages = [
-  const HomePage(),
-  const ActivityPage(),
-  const MainPage(),
-  const ConversationListPage(),
-  const ProfilePage(),
-];
+// Function để lấy page index 2 dựa vào role
+Widget _getMiddlePage(String? role) {
+  if (role == 'BENEFICIARY') {
+    return const SosEmergencyPage(); // NCGD: SOS page
+  } else {
+    return const MainPage(); // VOLUNTEER/ADMIN/ORG: Map page
+  }
+}
+
+List<Widget> _getPages(String? userRole) => [
+      const HomePage(),
+      const ActivityPage(),
+      _getMiddlePage(userRole),
+      const ConversationListPage(),
+      const ProfilePage(),
+    ];
 
 class WidgetTree extends StatefulWidget {
   const WidgetTree({super.key});
@@ -58,6 +68,9 @@ class _WidgetTreeState extends State<WidgetTree> {
         if (snapshot.hasData && snapshot.data != null) {
           // QUAN TRỌNG: Lưu user vào biến toàn cục để dùng ở HomePage, ProfilePage...
           currentUser = snapshot.data;
+
+          // Tạo pages dựa vào role của user
+          final pages = _getPages(currentUser?.role);
 
           return Scaffold(
             body: ValueListenableBuilder(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/data/notifiers.dart';
+import 'package:mobile/views/widget_tree.dart';
 
 class NavbarWidget extends StatelessWidget {
   const NavbarWidget({super.key});
@@ -97,7 +98,9 @@ class NavbarWidget extends StatelessWidget {
                         border: Border.all(color: Colors.white, width: 4),
                       ),
                       child: Icon(
-                        Icons.map,
+                        currentUser?.role == 'BENEFICIARY'
+                            ? Icons.emergency
+                            : Icons.map,
                         color: selectedPage == 2
                             ? Colors.white
                             : Colors.white.withOpacity(0.8),
