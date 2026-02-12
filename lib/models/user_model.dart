@@ -1,4 +1,5 @@
 // lib/models/user_model.dart
+import 'package:mobile/utils/date_utils.dart';
 
 class UserModel {
   final String id;
@@ -92,7 +93,7 @@ class VolunteerProfile {
       organizationStatus: json['organizationStatus'],
       points: json['points'] ?? 0,
       joinedOrganizationAt: json['joinedOrganizationAt'] != null
-          ? DateTime.tryParse(json['joinedOrganizationAt'])
+          ? DateTimeUtils.parseFromApi(json['joinedOrganizationAt'])
           : null,
       organizationId: json['organizationId'],
     );

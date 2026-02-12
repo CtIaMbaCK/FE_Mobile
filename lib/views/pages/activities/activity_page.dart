@@ -5,7 +5,9 @@ import 'package:mobile/views/pages/activities/volunteer_activity.dart';
 
 
 class ActivityPage extends StatefulWidget {
-  const ActivityPage({super.key});
+  final int initialTabIndex;
+
+  const ActivityPage({super.key, this.initialTabIndex = 0});
 
   @override
   State<ActivityPage> createState() => _ActivityPageState();
@@ -98,7 +100,10 @@ class _ActivityPageState extends State<ActivityPage> {
 
     // 3. Render Activity Page dựa trên Role
     if (_role == "VOLUNTEER") {
-      return VolunteerActivityPage(userData: _userData!);
+      return VolunteerActivityPage(
+        userData: _userData!,
+        initialTabIndex: widget.initialTabIndex,
+      );
     } else if (_role == "BENEFICIARY") {
       return BeneficiaryActivityPage(userData: _userData!);
     } else {

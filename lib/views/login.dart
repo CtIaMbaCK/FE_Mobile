@@ -146,14 +146,19 @@ class _LoginPageState extends State<LoginPage> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const CircleAvatar(
-                        radius: 30,
-                        backgroundColor: Color(0xFF008080),
-                        child: Icon(
-                          Icons.volunteer_activism,
-                          color: Colors.white,
-                          size: 30,
-                        ),
+                      // const CircleAvatar(
+                      //   radius: 30,
+                      //   backgroundColor: Color(0xFF008080),
+                      //   child: Icon(
+                      //     Icons.volunteer_activism,
+                      //     color: Colors.white,
+                      //     size: 30,
+                      //   ),
+                      // ),
+                      Image.asset(
+                        'assets/images/Logo.png',
+                        width: 60,
+                        height: 60,
                       ),
                       const SizedBox(width: 12),
                       Text(
@@ -316,7 +321,6 @@ class _LoginPageState extends State<LoginPage> {
                         //     ),
                         //   ),
                         // ),
-
                         const SizedBox(height: 24),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,

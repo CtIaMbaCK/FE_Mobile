@@ -4,6 +4,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:mobile/services/auth_service.dart';
 import 'package:mobile/views/widgets/modern_ui_widgets.dart';
 import 'settings_page.dart';
+import 'volunteer_activity_history_page.dart';
+import 'volunteer_certificates_page.dart';
 
 class VolunteerProfileView extends StatefulWidget {
   final Map<String, dynamic> userData;
@@ -194,6 +196,53 @@ class _VolunteerProfileViewState extends State<VolunteerProfileView>
                           value: (_cachedTotalThanks ?? 0).toString(),
                           label: 'Lượt cảm ơn',
                         ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 24),
+
+              // Navigation Cards
+              StaggeredListItem(
+                index: 3,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: Column(
+                    children: [
+                      _buildNavigationCard(
+                        icon: Icons.history,
+                        iconColor: const Color(0xFF2196F3),
+                        iconBackground: Colors.blue[50]!,
+                        title: 'Lịch sử hoạt động',
+                        subtitle: 'Xem các hoạt động đã tham gia',
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  const VolunteerActivityHistoryPage(),
+                            ),
+                          );
+                        },
+                      ),
+                      const SizedBox(height: 12),
+                      _buildNavigationCard(
+                        icon: Icons.workspace_premium,
+                        iconColor: const Color(0xFFFFA000),
+                        iconBackground: Colors.amber[50]!,
+                        title: 'Chứng nhận',
+                        subtitle: 'Xem và lưu chứng nhận của bạn',
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  const VolunteerCertificatesPage(),
+                            ),
+                          );
+                        },
                       ),
                     ],
                   ),
@@ -401,6 +450,70 @@ class _VolunteerProfileViewState extends State<VolunteerProfileView>
             overflow: TextOverflow.ellipsis,
           ),
         ],
+      ),
+    );
+  }
+
+  // Navigation Card - để navigate đến các trang mới
+  Widget _buildNavigationCard({
+    required IconData icon,
+    required Color iconColor,
+    required Color iconBackground,
+    required String title,
+    required String subtitle,
+    required VoidCallback onTap,
+  }) {
+    return GlassMorphismCard(
+      padding: EdgeInsets.zero,
+      backgroundColor: Colors.white.withValues(alpha: 0.95),
+      blur: 15,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: iconBackground,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(icon, color: iconColor, size: 24),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      subtitle,
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              Icon(
+                Icons.chevron_right,
+                color: Colors.grey[400],
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

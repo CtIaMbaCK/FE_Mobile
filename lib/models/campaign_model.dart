@@ -1,3 +1,5 @@
+import 'package:mobile/utils/date_utils.dart';
+
 class CampaignModel {
   final String id;
   final String organizationId;
@@ -47,7 +49,7 @@ class CampaignModel {
     DateTime safeParse(dynamic value) {
       if (value == null) return DateTime.now();
       try {
-        return DateTime.parse(value.toString());
+        return DateTimeUtils.parseFromApi(value.toString());
       } catch (e) {
         return DateTime.now();
       }
@@ -128,7 +130,7 @@ class CampaignRegistrationModel {
       volunteerId: json['volunteerId']?.toString() ?? '',
       status: json['status']?.toString() ?? 'REGISTERED',
       registeredAt: json['registeredAt'] != null
-          ? DateTime.parse(json['registeredAt'])
+          ? DateTimeUtils.parseFromApi(json['registeredAt'])
           : DateTime.now(),
       notes: json['notes']?.toString(),
       campaign: json['campaign'] != null

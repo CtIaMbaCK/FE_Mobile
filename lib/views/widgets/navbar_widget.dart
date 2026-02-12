@@ -72,7 +72,7 @@ class NavbarWidget extends StatelessWidget {
                     }
                   },
                   selectedIndex: selectedPage,
-                  backgroundColor: const Color(0xff000000),
+                  backgroundColor: activeColor.withOpacity(0.1),
                   elevation: 3,
                 ),
 

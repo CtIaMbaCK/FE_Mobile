@@ -4,6 +4,7 @@ import 'package:mobile/models/blog_model.dart';
 import 'package:mobile/services/blog_service.dart';
 import 'package:mobile/views/pages/home/buildCard.dart';
 import 'package:mobile/views/pages/home/blog_detail_page.dart';
+import 'package:mobile/utils/date_utils.dart';
 
 class BlogPage extends StatefulWidget {
   const BlogPage({super.key});
@@ -92,23 +93,7 @@ class _BlogPageState extends State<BlogPage> {
   }
 
   String _formatTime(String dateTimeStr) {
-    try {
-      final dateTime = DateTime.parse(dateTimeStr);
-      final now = DateTime.now();
-      final difference = now.difference(dateTime);
-
-      if (difference.inMinutes < 60) {
-        return '${difference.inMinutes} phút trước';
-      } else if (difference.inHours < 24) {
-        return '${difference.inHours} giờ trước';
-      } else if (difference.inDays < 7) {
-        return '${difference.inDays} ngày trước';
-      } else {
-        return '${dateTime.day}/${dateTime.month}/${dateTime.year}';
-      }
-    } catch (e) {
-      return 'Vừa xong';
-    }
+    return DateTimeUtils.formatRelativeTime(dateTimeStr);
   }
 
   @override

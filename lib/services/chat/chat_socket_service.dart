@@ -1,6 +1,7 @@
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../../models/chat/message_model.dart';
+import '../../utils/date_utils.dart';
 
 class ChatSocketService {
   static final ChatSocketService _instance = ChatSocketService._internal();
@@ -29,12 +30,26 @@ class ChatSocketService {
 
   bool get isConnected => _socket?.connected ?? false;
 
+  // Connection state
+  bool _isConnecting = false;
+  int _reconnectAttempts = 0;
+  static const int _maxReconnectAttempts = 5;
+  static const Duration _reconnectDelay = Duration(seconds: 3);
+
   // Kết nối Socket.io
   Future<void> connect() async {
+    // Prevent multiple simultaneous connection attempts
+    if (_isConnecting) {
+      print('Socket connection already in progress');
+      return;
+    }
+
     if (_socket?.connected ?? false) {
       print('Socket already connected');
       return;
     }
+
+    _isConnecting = true;
 
     try {
       // Lấy token từ secure storage
@@ -42,6 +57,7 @@ class ChatSocketService {
 
       if (token == null || token.isEmpty) {
         print('No token found for socket connection');
+        _isConnecting = false;
         return;
       }
 
@@ -59,23 +75,66 @@ class ChatSocketService {
               'Authorization': 'Bearer $token',
               'ngrok-skip-browser-warning': 'true',
             })
+            // Thêm timeout để tránh treo khi mạng 4G chậm
+            .setTimeout(10000)  // 10 seconds timeout
+            // Thêm reconnection settings
+            .enableReconnection()
+            .setReconnectionAttempts(_maxReconnectAttempts)
+            .setReconnectionDelay(_reconnectDelay.inMilliseconds)
+            .setReconnectionDelayMax(10000)  // Max 10s between attempts
             .build(),
       );
 
       // Connection events
       _socket!.onConnect((_) {
         print('✅ Socket connected! ID: ${_socket!.id}');
+        _isConnecting = false;
+        _reconnectAttempts = 0;  // Reset counter on successful connection
       });
 
       _socket!.onConnectError((data) {
         print('❌ Socket connect error: $data');
+        _isConnecting = false;
+        _reconnectAttempts++;
+
         if (onError != null) {
-          onError!('Kết nối thất bại: $data');
+          if (_reconnectAttempts >= _maxReconnectAttempts) {
+            onError!('Không thể kết nối server. Vui lòng kiểm tra kết nối mạng.');
+          } else {
+            onError!('Đang thử kết nối lại... (${_reconnectAttempts}/$_maxReconnectAttempts)');
+          }
         }
       });
 
-      _socket!.onDisconnect((_) {
-        print('❌ Socket disconnected');
+      _socket!.onDisconnect((reason) {
+        print('❌ Socket disconnected: $reason');
+        _isConnecting = false;
+
+        // Auto reconnect on certain disconnect reasons
+        if (reason == 'transport close' || reason == 'ping timeout') {
+          print('⚠️ Network issue detected, will auto-reconnect...');
+        }
+      });
+
+      _socket!.onReconnect((attempt) {
+        print('🔄 Socket reconnected after $attempt attempts');
+        _reconnectAttempts = 0;
+      });
+
+      _socket!.onReconnectAttempt((attempt) {
+        print('🔄 Reconnect attempt $attempt/$_maxReconnectAttempts');
+      });
+
+      _socket!.onReconnectError((data) {
+        print('❌ Reconnect error: $data');
+      });
+
+      _socket!.onReconnectFailed((_) {
+        print('❌ Reconnection failed after $_maxReconnectAttempts attempts');
+        _isConnecting = false;
+        if (onError != null) {
+          onError!('Không thể kết nối server. Vui lòng thử lại sau.');
+        }
       });
 
       // Message events
@@ -107,7 +166,7 @@ class ChatSocketService {
         print('👁️ Message read: ${data['messageId']}');
         if (onMessageRead != null && data['messageId'] != null) {
           final readAt = data['readAt'] != null
-              ? DateTime.parse(data['readAt'])
+              ? DateTimeUtils.parseFromApi(data['readAt'])
               : DateTime.now();
           onMessageRead!(data['messageId'], readAt);
         }
@@ -180,20 +239,41 @@ class ChatSocketService {
   // Ngắt kết nối
   void disconnect() {
     print('Disconnecting socket...');
+    _isConnecting = false;
+    _reconnectAttempts = 0;
     _socket?.disconnect();
     _socket?.dispose();
     _socket = null;
   }
 
+  // Kết nối lại thủ công (dùng khi mạng trở lại)
+  Future<void> reconnect() async {
+    print('🔄 Manual reconnect requested');
+    disconnect();
+    await Future.delayed(const Duration(milliseconds: 500));
+    await connect();
+  }
+
+  // Kiểm tra trạng thái kết nối và thử kết nối lại nếu cần
+  Future<void> ensureConnected() async {
+    if (!isConnected && !_isConnecting) {
+      print('⚠️ Socket not connected, attempting to reconnect...');
+      await connect();
+    }
+  }
+
   // Gửi tin nhắn
-  void sendMessage({
+  Future<void> sendMessage({
     required String conversationId,
     required String content,
-  }) {
+  }) async {
+    // Đảm bảo socket đã kết nối
+    await ensureConnected();
+
     if (!isConnected) {
-      print('Socket not connected');
+      print('Socket not connected after ensure');
       if (onError != null) {
-        onError!('Chưa kết nối server');
+        onError!('Không thể kết nối server. Vui lòng kiểm tra mạng.');
       }
       return;
     }
@@ -237,11 +317,14 @@ class ChatSocketService {
   }
 
   // Gửi SOS Emergency
-  void sendSOS({String? notes}) {
+  Future<void> sendSOS({String? notes}) async {
+    // Đảm bảo socket đã kết nối
+    await ensureConnected();
+
     if (!isConnected) {
       print('Socket not connected for SOS');
       if (onError != null) {
-        onError!('Chưa kết nối server');
+        onError!('Không thể kết nối server. Vui lòng kiểm tra mạng.');
       }
       return;
     }

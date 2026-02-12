@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'dart:async';
 import '../../../models/chat/conversation_model.dart';
 import '../../../models/chat/message_model.dart';
 import '../../../services/chat/chat_api_service.dart';
 import '../../../services/chat/chat_socket_service.dart';
+import '../../../utils/date_utils.dart';
 
 class ChatRoomPage extends StatefulWidget {
   final ConversationModel conversation;
@@ -114,7 +114,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
     });
   }
 
-  void _sendMessage() {
+  Future<void> _sendMessage() async {
     final content = _messageController.text.trim();
     if (content.isEmpty || _isSending) return;
 
@@ -139,8 +139,8 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
     _messageController.clear();
     _scrollToBottom();
 
-    // Send via socket
-    _socketService.sendMessage(
+    // Send via socket (now async)
+    await _socketService.sendMessage(
       conversationId: widget.conversation.id,
       content: content,
     );
@@ -475,7 +475,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  DateFormat('HH:mm').format(message.createdAt),
+                  DateTimeUtils.formatMessageTime(message.createdAt),
                   style: TextStyle(
                     color: isMe ? Colors.white70 : Colors.grey[600],
                     fontSize: 11,

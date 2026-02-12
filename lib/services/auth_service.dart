@@ -295,16 +295,17 @@ class AuthService {
 
       request.fields['experienceYears'] = experienceYears.toString();
 
-      // Gửi skills dưới dạng JSON string
+      // FIXED: Gửi skills dưới dạng comma-separated string
+      // Backend Transform decorator sẽ parse "LOGISTICS,TEACHING" thành array
       if (skills != null && skills.isNotEmpty) {
-        request.fields['skills'] = jsonEncode(skills);
-        print("DEBUG: Skills sent: ${jsonEncode(skills)}");
+        request.fields['skills'] = skills.join(',');
+        print("DEBUG: Skills sent: ${skills.join(',')}");
       }
 
-      // Gửi preferredDistricts dưới dạng JSON string
+      // FIXED: Gửi preferredDistricts dưới dạng comma-separated string
       if (preferredDistricts != null && preferredDistricts.isNotEmpty) {
-        request.fields['preferredDistricts'] = jsonEncode(preferredDistricts);
-        print("DEBUG: Districts sent: ${jsonEncode(preferredDistricts)}");
+        request.fields['preferredDistricts'] = preferredDistricts.join(',');
+        print("DEBUG: Districts sent: ${preferredDistricts.join(',')}");
       }
 
       if (avatar != null) {

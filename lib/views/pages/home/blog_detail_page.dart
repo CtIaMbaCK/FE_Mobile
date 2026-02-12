@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:mobile/models/blog_model.dart';
 import 'package:mobile/services/blog_service.dart';
+import 'package:mobile/utils/date_utils.dart';
 
 class BlogDetailPage extends StatefulWidget {
   final String blogId;
@@ -59,7 +60,7 @@ class _BlogDetailPageState extends State<BlogDetailPage> {
 
   String _formatTime(String dateTimeStr) {
     try {
-      final dateTime = DateTime.parse(dateTimeStr);
+      final dateTime = DateTimeUtils.parseFromApi(dateTimeStr);
       return '${dateTime.day}/${dateTime.month}/${dateTime.year} lúc ${dateTime.hour}:${dateTime.minute.toString().padLeft(2, '0')}';
     } catch (e) {
       return dateTimeStr;

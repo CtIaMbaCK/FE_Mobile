@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import '../../../models/chat/conversation_model.dart';
 import '../../../services/chat/chat_api_service.dart';
 import '../../../services/chat/chat_socket_service.dart';
+import '../../../utils/date_utils.dart';
 import 'chat_room_page.dart';
 import 'user_search_dialog.dart';
 
@@ -227,19 +227,7 @@ class _ConversationListPageState extends State<ConversationListPage> {
     // Time
     String timeText = '';
     if (conversation.lastMessageAt != null) {
-      final now = DateTime.now();
-      final messageTime = conversation.lastMessageAt!;
-      final difference = now.difference(messageTime);
-
-      if (difference.inDays == 0) {
-        timeText = DateFormat('HH:mm').format(messageTime);
-      } else if (difference.inDays == 1) {
-        timeText = 'Hôm qua';
-      } else if (difference.inDays < 7) {
-        timeText = '${difference.inDays} ngày trước';
-      } else {
-        timeText = DateFormat('dd/MM').format(messageTime);
-      }
+      timeText = DateTimeUtils.formatLastMessageTime(conversation.lastMessageAt!);
     }
 
     return InkWell(

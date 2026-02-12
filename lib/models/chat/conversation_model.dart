@@ -1,3 +1,5 @@
+import 'package:mobile/utils/date_utils.dart';
+
 class ConversationModel {
   final String id;
   final OtherUserModel otherUser;
@@ -21,9 +23,9 @@ class ConversationModel {
           ? LastMessageModel.fromJson(json['lastMessage'])
           : null,
       lastMessageAt: json['lastMessageAt'] != null
-          ? DateTime.parse(json['lastMessageAt'])
+          ? DateTimeUtils.parseFromApi(json['lastMessageAt'])
           : null,
-      createdAt: DateTime.parse(json['createdAt']),
+      createdAt: DateTimeUtils.parseFromApi(json['createdAt']),
     );
   }
 
@@ -134,7 +136,7 @@ class LastMessageModel {
   factory LastMessageModel.fromJson(Map<String, dynamic> json) {
     return LastMessageModel(
       content: json['content'],
-      createdAt: DateTime.parse(json['createdAt']),
+      createdAt: DateTimeUtils.parseFromApi(json['createdAt']),
       isRead: json['isRead'],
       senderId: json['senderId'],
     );

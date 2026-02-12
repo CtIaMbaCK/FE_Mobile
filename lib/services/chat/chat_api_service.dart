@@ -8,6 +8,9 @@ class ChatApiService {
   static const String baseUrl = 'https://frettiest-ariella-unnationally.ngrok-free.dev/api/v1';
   final _storage = const FlutterSecureStorage();
 
+  // Timeout cho các requests (quan trọng cho 4G)
+  static const Duration _requestTimeout = Duration(seconds: 15);
+
   // Helper: Lấy headers với token
   Future<Map<String, String>> _getHeaders() async {
     final token = await _storage.read(key: 'token');
@@ -30,7 +33,12 @@ class ChatApiService {
       final uri = Uri.parse('$baseUrl/chat/search-users?q=${Uri.encodeComponent(searchTerm)}');
 
       print('Searching users: $searchTerm');
-      final response = await http.get(uri, headers: headers);
+      final response = await http.get(uri, headers: headers).timeout(
+        _requestTimeout,
+        onTimeout: () {
+          throw Exception('Kết nối quá chậm. Vui lòng kiểm tra mạng 4G.');
+        },
+      );
 
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
@@ -78,7 +86,12 @@ class ChatApiService {
       final uri = Uri.parse('$baseUrl/chat/conversations');
 
       print('Fetching conversations...');
-      final response = await http.get(uri, headers: headers);
+      final response = await http.get(uri, headers: headers).timeout(
+        _requestTimeout,
+        onTimeout: () {
+          throw Exception('Kết nối quá chậm. Vui lòng kiểm tra mạng.');
+        },
+      );
 
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
@@ -105,6 +118,11 @@ class ChatApiService {
         uri,
         headers: headers,
         body: json.encode({'targetUserId': targetUserId}),
+      ).timeout(
+        _requestTimeout,
+        onTimeout: () {
+          throw Exception('Kết nối quá chậm. Vui lòng thử lại.');
+        },
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
@@ -155,7 +173,12 @@ class ChatApiService {
       );
 
       print('Fetching messages for conversation: $conversationId (page $page)');
-      final response = await http.get(uri, headers: headers);
+      final response = await http.get(uri, headers: headers).timeout(
+        _requestTimeout,
+        onTimeout: () {
+          throw Exception('Kết nối quá chậm. Vui lòng thử lại.');
+        },
+      );
 
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
@@ -222,6 +245,11 @@ class ChatApiService {
         uri,
         headers: headers,
         body: json.encode({'organizationId': organizationId}),
+      ).timeout(
+        _requestTimeout,
+        onTimeout: () {
+          throw Exception('Kết nối quá chậm. Vui lòng thử lại.');
+        },
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {

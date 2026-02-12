@@ -1,3 +1,5 @@
+import 'package:mobile/utils/date_utils.dart';
+
 class HelpRequestModel {
   final String id;
   final String requesterId;
@@ -54,7 +56,7 @@ class HelpRequestModel {
     DateTime safeParse(dynamic value) {
       if (value == null) return DateTime.now();
       try {
-        return DateTime.parse(value.toString());
+        return DateTimeUtils.parseFromApi(value.toString());
       } catch (e) {
         return DateTime.now();
       }
@@ -65,7 +67,7 @@ class HelpRequestModel {
       requesterId: json['requesterId']?.toString() ?? '',
       volunteerId: json['volunteerId']?.toString(),
       acceptedAt: json['acceptedAt'] != null
-          ? DateTime.tryParse(json['acceptedAt'])
+          ? DateTimeUtils.parseFromApi(json['acceptedAt'])
           : null,
       activityType: json['activityType']?.toString() ?? 'OTHER',
       title: json['title']?.toString() ?? 'Không tiêu đề',
@@ -77,7 +79,7 @@ class HelpRequestModel {
       // Sử dụng safeParse cho các trường bắt buộc để không bao giờ bị crash
       startDate: safeParse(json['startDate']),
       endDate: json['endDate'] != null
-          ? DateTime.tryParse(json['endDate'])
+          ? DateTimeUtils.parseFromApi(json['endDate'])
           : null,
       startTime: safeParse(json['startTime']),
       endTime: safeParse(json['endTime']),
@@ -102,7 +104,7 @@ class HelpRequestModel {
           ? (json['longitude'] as num).toDouble()
           : null,
 
-      doneAt: json['doneAt'] != null ? DateTime.tryParse(json['doneAt']) : null,
+      doneAt: json['doneAt'] != null ? DateTimeUtils.parseFromApi(json['doneAt']) : null,
       proofImages:
           (json['proofImages'] as List?)?.map((e) => e.toString()).toList() ??
           [],

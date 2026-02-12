@@ -1,3 +1,5 @@
+import 'package:mobile/utils/date_utils.dart';
+
 class MessageModel {
   final String id;
   final String conversationId;
@@ -26,8 +28,8 @@ class MessageModel {
       senderId: json['senderId'],
       content: json['content'],
       isRead: json['isRead'],
-      readAt: json['readAt'] != null ? DateTime.parse(json['readAt']) : null,
-      createdAt: DateTime.parse(json['createdAt']),
+      readAt: json['readAt'] != null ? DateTimeUtils.parseFromApi(json['readAt']) : null,
+      createdAt: DateTimeUtils.parseFromApi(json['createdAt']),
       sender: json['sender'] != null
           ? MessageSenderModel.fromJson(json['sender'])
           : null,

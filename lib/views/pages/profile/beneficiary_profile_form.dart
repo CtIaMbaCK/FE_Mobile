@@ -7,6 +7,7 @@ import 'package:mobile/data/notifiers.dart';
 import 'package:mobile/services/auth_service.dart';
 import 'package:mobile/views/login.dart';
 import 'package:mobile/views/widgets/modern_ui_widgets.dart';
+import 'package:mobile/views/pages/profile/beneficiary_activity_history_page.dart';
 
 class BeneficiaryProfileEditForm extends StatefulWidget {
   final Map<String, dynamic> initialData;
@@ -198,6 +199,88 @@ class _BeneficiaryProfileEditFormState
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  /// Navigation Card: Lịch sử hoạt động
+  Widget _buildActivityHistoryCard() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const BeneficiaryActivityHistoryPage(),
+              ),
+            );
+          },
+          borderRadius: BorderRadius.circular(16),
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Row(
+              children: [
+                // Icon
+                Container(
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: Colors.blue[50],
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(
+                    Icons.history,
+                    color: Colors.blue[700],
+                    size: 28,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                // Text
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Lịch sử hoạt động',
+                        style: GoogleFonts.roboto(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w600,
+                          color: const Color(0xFF1A1A1A),
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Xem các yêu cầu giúp đỡ của bạn',
+                        style: GoogleFonts.roboto(
+                          fontSize: 14,
+                          color: const Color(0xFF757575),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                // Arrow icon
+                Icon(
+                  Icons.chevron_right,
+                  color: Colors.grey[400],
+                  size: 28,
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -1300,6 +1383,10 @@ class _BeneficiaryProfileEditFormState
           children: [
             // Section 1: Avatar
             _buildAvatarSection(),
+            const SizedBox(height: 24),
+
+            // Navigation: Lịch sử hoạt động
+            _buildActivityHistoryCard(),
             const SizedBox(height: 32),
 
             // Section 2: Thông tin cơ bản

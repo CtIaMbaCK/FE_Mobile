@@ -118,8 +118,8 @@ class _SosEmergencyPageState extends State<SosEmergencyPage>
     });
 
     try {
-      // Gửi SOS qua Socket.IO
-      _socketService.sendSOS();
+      // Gửi SOS qua Socket.IO (now async)
+      await _socketService.sendSOS();
 
       // Backup: Gửi qua REST API (nếu socket fail)
       await _emergencyService.createEmergency();

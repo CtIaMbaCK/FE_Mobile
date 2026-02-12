@@ -9,8 +9,13 @@ import 'package:mobile/views/pages/activities/request_detail_page.dart';
 
 class VolunteerActivityPage extends StatefulWidget {
   final Map<String, dynamic> userData;
+  final int initialTabIndex;
 
-  const VolunteerActivityPage({super.key, required this.userData});
+  const VolunteerActivityPage({
+    super.key,
+    required this.userData,
+    this.initialTabIndex = 0,
+  });
 
   @override
   State<VolunteerActivityPage> createState() => _VolunteerActivityPageState();
@@ -30,7 +35,11 @@ class _VolunteerActivityPageState extends State<VolunteerActivityPage>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(
+      length: 2,
+      vsync: this,
+      initialIndex: widget.initialTabIndex,
+    );
     _loadRequests();
     _loadCampaigns();
   }

@@ -3,7 +3,10 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:intl/intl.dart';
 import 'package:mobile/models/request_model.dart';
 import 'package:mobile/services/request_service.dart';
+import 'package:mobile/services/auth_service.dart';
+import 'package:mobile/services/feedback_service.dart';
 import 'package:mobile/views/pages/activities/complete_request_page.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class RequestDetailPage extends StatefulWidget {
   final HelpRequestModel request;
@@ -21,13 +24,25 @@ class RequestDetailPage extends StatefulWidget {
 
 class _RequestDetailPageState extends State<RequestDetailPage> {
   final RequestService _requestService = RequestService();
+  final FeedbackService _feedbackService = FeedbackService();
   bool _isAccepting = false;
   late HelpRequestModel _currentRequest;
+
+  // Rating form states
+  int _rating = 5;
+  final _commentController = TextEditingController();
+  bool _isSubmittingReview = false;
 
   @override
   void initState() {
     super.initState();
     _currentRequest = widget.request;
+  }
+
+  @override
+  void dispose() {
+    _commentController.dispose();
+    super.dispose();
   }
 
   String _getActivityTypeName(String type) {
@@ -149,6 +164,48 @@ class _RequestDetailPageState extends State<RequestDetailPage> {
 
     if (result == true && mounted) {
       Navigator.pop(context, true);
+    }
+  }
+
+  Future<void> _openGoogleMaps() async {
+    if (_currentRequest.latitude == null || _currentRequest.longitude == null) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Không có tọa độ địa chỉ'),
+            backgroundColor: Colors.orange,
+          ),
+        );
+      }
+      return;
+    }
+
+    final lat = _currentRequest.latitude;
+    final lng = _currentRequest.longitude;
+    final url = Uri.parse('https://www.google.com/maps/dir/?api=1&destination=$lat,$lng');
+
+    try {
+      if (await canLaunchUrl(url)) {
+        await launchUrl(url, mode: LaunchMode.externalApplication);
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Không thể mở Google Maps'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Lỗi: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
   }
 
@@ -313,12 +370,7 @@ class _RequestDetailPageState extends State<RequestDetailPage> {
                         title: 'Loại hoạt động',
                         value: _getActivityTypeName(_currentRequest.activityType),
                       ),
-                      _buildInfoCard(
-                        icon: Icons.location_on_outlined,
-                        iconColor: Colors.orange,
-                        title: 'Địa chỉ',
-                        value: '${_currentRequest.addressDetail}\n${_getDistrictName(_currentRequest.district)}',
-                      ),
+                      _buildAddressCard(),
                       _buildInfoCard(
                         icon: Icons.calendar_today_outlined,
                         iconColor: Colors.blue,
@@ -425,6 +477,12 @@ class _RequestDetailPageState extends State<RequestDetailPage> {
                           value: DateFormat('dd/MM/yyyy HH:mm').format(_currentRequest.doneAt!),
                         ),
 
+                      // Rating form cho NCGD khi hoạt động COMPLETED
+                      if (_shouldShowRatingForm()) ...[
+                        const SizedBox(height: 24),
+                        _buildRatingSection(),
+                      ],
+
                       const SizedBox(height: 100),
                     ],
                   ),
@@ -435,6 +493,78 @@ class _RequestDetailPageState extends State<RequestDetailPage> {
         ],
       ),
       bottomNavigationBar: _buildBottomButton(),
+    );
+  }
+
+  Widget _buildAddressCard() {
+    final currentUser = AuthService.currentUser;
+    final isVolunteer = currentUser?.role == 'VOLUNTEER';
+    final hasCoordinates = _currentRequest.latitude != null && _currentRequest.longitude != null;
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: Colors.orange.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const Icon(Icons.location_on_outlined, color: Colors.orange, size: 22),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Địa chỉ', style: TextStyle(fontSize: 13, color: Colors.grey[600], fontWeight: FontWeight.w500)),
+                const SizedBox(height: 4),
+                Text(
+                  '${_currentRequest.addressDetail}\n${_getDistrictName(_currentRequest.district)}',
+                  style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600, height: 1.4),
+                ),
+                if (isVolunteer && hasCoordinates) ...[
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      onPressed: _openGoogleMaps,
+                      icon: const Icon(Icons.directions, size: 18),
+                      label: const Text(
+                        'Xem đường đi trên Google Maps',
+                        style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.orange,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -491,7 +621,14 @@ class _RequestDetailPageState extends State<RequestDetailPage> {
   }
 
   Widget? _buildBottomButton() {
-    if (_currentRequest.volunteerId == null && _currentRequest.status == 'APPROVED') {
+    // Lấy thông tin user hiện tại
+    final currentUser = AuthService.currentUser;
+    final isVolunteer = currentUser?.role == 'VOLUNTEER';
+
+    // Chỉ hiển thị nút "Chấp nhận yêu cầu" nếu là VOLUNTEER
+    if (_currentRequest.volunteerId == null &&
+        _currentRequest.status == 'APPROVED' &&
+        isVolunteer) {
       return Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
@@ -546,5 +683,265 @@ class _RequestDetailPageState extends State<RequestDetailPage> {
     }
 
     return null;
+  }
+
+  /// Kiểm tra có nên hiển thị rating form hay không
+  bool _shouldShowRatingForm() {
+    // Chỉ hiển thị khi:
+    // 1. Request đã COMPLETED
+    // 2. User hiện tại là BENEFICIARY (người tạo request)
+    // 3. Request có volunteerId (đã có TNV nhận)
+    final currentUser = AuthService.currentUser;
+    return _currentRequest.status == 'COMPLETED' &&
+        currentUser?.role == 'BENEFICIARY' &&
+        _currentRequest.volunteerId != null &&
+        _currentRequest.requesterId == currentUser?.id;
+  }
+
+  /// Build rating form section
+  Widget _buildRatingSection() {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 20),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: Colors.amber[50],
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(
+                  Icons.star_rate,
+                  color: Colors.amber[700],
+                  size: 28,
+                ),
+              ),
+              const SizedBox(width: 12),
+              const Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Đánh giá tình nguyện viên',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF1A1A1A),
+                      ),
+                    ),
+                    SizedBox(height: 4),
+                    Text(
+                      'Đánh giá chất lượng hỗ trợ',
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Color(0xFF757575),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 24),
+
+          // Rating stars
+          const Text(
+            'Đánh giá của bạn',
+            style: TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
+              color: Color(0xFF1A1A1A),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: List.generate(5, (index) {
+              final starValue = index + 1;
+              return GestureDetector(
+                onTap: () {
+                  setState(() {
+                    _rating = starValue;
+                  });
+                },
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Icon(
+                    starValue <= _rating ? Icons.star : Icons.star_border,
+                    size: 48,
+                    color: Colors.amber,
+                  ),
+                ),
+              );
+            }),
+          ),
+
+          const SizedBox(height: 24),
+
+          // Comment field
+          const Text(
+            'Nhận xét (không bắt buộc)',
+            style: TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
+              color: Color(0xFF1A1A1A),
+            ),
+          ),
+          const SizedBox(height: 12),
+          TextField(
+            controller: _commentController,
+            maxLines: 4,
+            maxLength: 500,
+            decoration: InputDecoration(
+              hintText: 'Chia sẻ trải nghiệm của bạn về tình nguyện viên...',
+              hintStyle: const TextStyle(color: Color(0xFFBDBDBD)),
+              filled: true,
+              fillColor: Colors.grey[50],
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: Colors.grey[300]!),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: Colors.grey[300]!),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: const BorderSide(color: Color(0xFF008080), width: 2),
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 20),
+
+          // Submit button
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: _isSubmittingReview ? null : _submitReview,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF008080),
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                elevation: 0,
+              ),
+              child: _isSubmittingReview
+                  ? const SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                      ),
+                    )
+                  : const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.send, size: 20),
+                        SizedBox(width: 8),
+                        Text(
+                          'Gửi đánh giá',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Submit review to volunteer
+  Future<void> _submitReview() async {
+    if (_currentRequest.volunteerId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Không tìm thấy tình nguyện viên'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    setState(() {
+      _isSubmittingReview = true;
+    });
+
+    try {
+      final success = await _feedbackService.submitReview(
+        activityId: _currentRequest.id,
+        targetId: _currentRequest.volunteerId!,
+        rating: _rating,
+        comment: _commentController.text.trim().isEmpty ? null : _commentController.text.trim(),
+      );
+
+      if (!mounted) return;
+
+      if (success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Row(
+              children: [
+                Icon(Icons.check_circle, color: Colors.white),
+                SizedBox(width: 12),
+                Text('Đã gửi đánh giá thành công!'),
+              ],
+            ),
+            backgroundColor: Colors.green,
+          ),
+        );
+
+        // Clear form
+        setState(() {
+          _rating = 5;
+          _commentController.clear();
+        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Không thể gửi đánh giá. Vui lòng thử lại.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Lỗi: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isSubmittingReview = false;
+        });
+      }
+    }
   }
 }

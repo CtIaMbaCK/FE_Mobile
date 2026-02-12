@@ -35,6 +35,10 @@ dependencies:
   mime: ^2.0.0
   http_parser: ^4.0.2
   socket_io_client: ^2.0.3+1
+  url_launcher: ^6.3.1
+  flutter_launcher_icons: ^0.14.4
+  gal: ^2.3.0  # Thay thế image_gallery_saver - package mới hơn, được maintain tốt
+  permission_handler: ^11.3.1
 
 dev_dependencies:
   flutter_test:
