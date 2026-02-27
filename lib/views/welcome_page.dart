@@ -78,7 +78,7 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
                             Text(
                               'Kết nối để sẻ chia',
                               textAlign: TextAlign.center,
-                              style: GoogleFonts.interTight(
+                              style: GoogleFonts.roboto(
                                 fontSize: 32,
                                 fontWeight: FontWeight.bold,
                                 color: const Color(0xFF006666),
@@ -88,7 +88,7 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
                             Text(
                               'Tham gia cộng đồng của chúng tôi và tạo ra tác động tích cực thông qua hoạt động tình nguyện.',
                               textAlign: TextAlign.center,
-                              style: GoogleFonts.inter(
+                              style: GoogleFonts.roboto(
                                 fontSize: 16,
                                 color: const Color(0xFF666666),
                                 height: 1.5,
@@ -143,7 +143,10 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
                         child: TextButton(
                           style: TextButton.styleFrom(
                             foregroundColor: Colors.white,
-                            backgroundColor: Color(0xff008080),
+                            backgroundColor: const Color(0xff008080),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(24),
+                            ),
                           ),
                           onPressed: () {
                             Navigator.push(
@@ -157,7 +160,7 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
                           },
                           child: Text(
                             'Bắt đầu',
-                            style: GoogleFonts.interTight(
+                            style: GoogleFonts.roboto(
                               fontSize: 16,
                               fontWeight: FontWeight.w700,
                             ),
@@ -176,8 +179,10 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
                               color: Color(0xff008080),
                               width: 2,
                             ),
-                            foregroundColor: Color(0xff008080),
-                            // backgroundColor: Color(0xff008080),
+                            foregroundColor: const Color(0xff008080),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(24),
+                            ),
                           ),
                           onPressed: () {
                             Navigator.push(
@@ -191,7 +196,7 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
                           },
                           child: Text(
                             'Bỏ qua',
-                            style: GoogleFonts.interTight(
+                            style: GoogleFonts.roboto(
                               fontSize: 16,
                               fontWeight: FontWeight.w700,
                             ),

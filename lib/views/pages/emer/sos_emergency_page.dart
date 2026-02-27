@@ -90,10 +90,7 @@ class _SosEmergencyPageState extends State<SosEmergencyPage>
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text(
-              'Hủy',
-              style: TextStyle(color: Colors.grey),
-            ),
+            child: const Text('Hủy', style: TextStyle(color: Colors.grey)),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
@@ -185,10 +182,7 @@ class _SosEmergencyPageState extends State<SosEmergencyPage>
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [
-              Color(0xFFFAFDFD),
-              Color(0xFFE8F6F6),
-            ],
+            colors: [Color(0xFFFAFDFD), Color(0xFFE8F6F6)],
           ),
         ),
         child: SafeArea(
@@ -241,8 +235,8 @@ class _SosEmergencyPageState extends State<SosEmergencyPage>
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
                                 border: Border.all(
-                                  color: tealColor.withOpacity(
-                                    0.4 * (1 - _rippleAnimation.value),
+                                  color: tealColor.withValues(
+                                    alpha: 0.4 * (1 - _rippleAnimation.value),
                                   ),
                                   width: 3,
                                 ),
@@ -270,7 +264,7 @@ class _SosEmergencyPageState extends State<SosEmergencyPage>
                                 color: tealColor,
                                 boxShadow: [
                                   BoxShadow(
-                                    color: tealColor.withOpacity(0.4),
+                                    color: tealColor.withValues(alpha: 0.4),
                                     blurRadius: 30,
                                     offset: const Offset(0, 10),
                                   ),
@@ -284,7 +278,8 @@ class _SosEmergencyPageState extends State<SosEmergencyPage>
                                       ),
                                     )
                                   : const Column(
-                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
                                       children: [
                                         Icon(
                                           Icons.emergency,
@@ -317,7 +312,7 @@ class _SosEmergencyPageState extends State<SosEmergencyPage>
                             color: const Color(0xff10B981),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.green.withOpacity(0.4),
+                                color: Colors.green.withValues(alpha: 0.4),
                                 blurRadius: 30,
                                 offset: const Offset(0, 10),
                               ),
@@ -366,7 +361,7 @@ class _SosEmergencyPageState extends State<SosEmergencyPage>
                   //     borderRadius: BorderRadius.circular(16),
                   //     boxShadow: [
                   //       BoxShadow(
-                  //         color: tealColor.withOpacity(0.08),
+                  //         color: tealColor.withValues(alpha: 0.08),
                   //         blurRadius: 20,
                   //         offset: const Offset(0, 4),
                   //       ),
@@ -428,7 +423,6 @@ class _SosEmergencyPageState extends State<SosEmergencyPage>
                   //       ],
                   //     ),
                   //   ),
-
                   const SizedBox(height: 20),
                 ],
               ),

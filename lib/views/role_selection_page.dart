@@ -128,16 +128,16 @@ class RoleSelectionPage extends StatelessWidget {
   }) {
     return InkWell(
       onTap: () => _handleRoleChoice(context, role),
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: BorderRadius.circular(24),
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           color: Colors.white,
           border: Border.all(color: Colors.grey.shade200, width: 1.5),
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(24),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.02),
+              color: const Color(0xFF008080).withValues(alpha: 0.04),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -148,7 +148,7 @@ class RoleSelectionPage extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: const Color(0xFF008080).withOpacity(0.1),
+                color: const Color(0xFF008080).withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(icon, size: 32, color: const Color(0xFF008080)),

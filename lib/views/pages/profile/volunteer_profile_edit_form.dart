@@ -97,7 +97,7 @@ class _VolunteerProfileEditFormState extends State<VolunteerProfileEditForm> {
               border: Border.all(color: const Color(0xFF008080), width: 3),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.grey.withOpacity(0.15),
+                  color: Colors.grey.withValues(alpha: 0.15),
                   blurRadius: 12,
                   offset: const Offset(0, 4),
                 ),
@@ -158,7 +158,7 @@ class _VolunteerProfileEditFormState extends State<VolunteerProfileEditForm> {
                   border: Border.all(color: Colors.white, width: 3),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
+                      color: Colors.black.withValues(alpha: 0.1),
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                     ),
@@ -186,7 +186,7 @@ class _VolunteerProfileEditFormState extends State<VolunteerProfileEditForm> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.08),
+            color: Colors.grey.withValues(alpha: 0.08),
             blurRadius: 16,
             offset: const Offset(0, 4),
           ),
@@ -237,7 +237,7 @@ class _VolunteerProfileEditFormState extends State<VolunteerProfileEditForm> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.08),
+            color: Colors.grey.withValues(alpha: 0.08),
             blurRadius: 16,
             offset: const Offset(0, 4),
           ),
@@ -321,7 +321,7 @@ class _VolunteerProfileEditFormState extends State<VolunteerProfileEditForm> {
               color: Colors.white,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.grey.withOpacity(0.1),
+                  color: Colors.grey.withValues(alpha: 0.1),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
@@ -447,7 +447,7 @@ class _VolunteerProfileEditFormState extends State<VolunteerProfileEditForm> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: Colors.grey.withValues(alpha: 0.1),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -487,7 +487,7 @@ class _VolunteerProfileEditFormState extends State<VolunteerProfileEditForm> {
               return FilterChip(
                 label: Text(SkillHelper.getDisplayName(skill)),
                 selected: isSelected,
-                selectedColor: const Color(0xFF008080).withOpacity(0.2),
+                selectedColor: const Color(0xFF008080).withValues(alpha: 0.2),
                 checkmarkColor: const Color(0xFF008080),
                 backgroundColor: Colors.grey.shade100,
                 labelStyle: GoogleFonts.roboto(
@@ -525,7 +525,7 @@ class _VolunteerProfileEditFormState extends State<VolunteerProfileEditForm> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: Colors.grey.withValues(alpha: 0.1),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -565,7 +565,7 @@ class _VolunteerProfileEditFormState extends State<VolunteerProfileEditForm> {
               return FilterChip(
                 label: Text(DistrictHelper.getDisplayName(district)),
                 selected: isSelected,
-                selectedColor: const Color(0xFF008080).withOpacity(0.2),
+                selectedColor: const Color(0xFF008080).withValues(alpha: 0.2),
                 checkmarkColor: const Color(0xFF008080),
                 backgroundColor: Colors.grey.shade100,
                 labelStyle: GoogleFonts.roboto(

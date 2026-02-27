@@ -169,7 +169,7 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
             height: 100,
             width: double.infinity,
             decoration: BoxDecoration(
-              color: Colors.teal.withOpacity(0.05),
+              color: Colors.teal.withValues(alpha: 0.05),
               border: Border.all(color: Colors.teal.shade100),
               borderRadius: BorderRadius.circular(12),
             ),

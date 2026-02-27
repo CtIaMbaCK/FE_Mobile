@@ -87,9 +87,7 @@ class _VolunteerActivityPageState extends State<VolunteerActivityPage>
   void _onRegisteredActivitiesPressed() {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => const RegisteredActivitiesPage(),
-      ),
+      MaterialPageRoute(builder: (context) => const RegisteredActivitiesPage()),
     ).then((value) {
       if (value == true) {
         _loadRequests();
@@ -161,11 +159,15 @@ class _VolunteerActivityPageState extends State<VolunteerActivityPage>
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
                 color: Colors.white,
+                borderRadius: const BorderRadius.only(
+                  bottomLeft: Radius.circular(24),
+                  bottomRight: Radius.circular(24),
+                ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.05),
+                    color: const Color(0xFF008080).withValues(alpha: 0.04),
                     blurRadius: 10,
-                    offset: const Offset(0, 2),
+                    offset: const Offset(0, 4),
                   ),
                 ],
               ),
@@ -176,10 +178,7 @@ class _VolunteerActivityPageState extends State<VolunteerActivityPage>
                   icon: const Icon(Icons.checklist_rounded, size: 20),
                   label: const Text(
                     'Các hoạt động đã đăng ký',
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
                   ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF008080),
@@ -284,10 +283,7 @@ class _VolunteerActivityPageState extends State<VolunteerActivityPage>
             const SizedBox(height: 8),
             Text(
               'Các yêu cầu trợ giúp sẽ hiện ở đây',
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey[500],
-              ),
+              style: TextStyle(fontSize: 14, color: Colors.grey[500]),
             ),
           ],
         ),
@@ -341,10 +337,7 @@ class _VolunteerActivityPageState extends State<VolunteerActivityPage>
             const SizedBox(height: 8),
             Text(
               'Các chiến dịch tình nguyện sẽ hiện ở đây',
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey[500],
-              ),
+              style: TextStyle(fontSize: 14, color: Colors.grey[500]),
             ),
           ],
         ),
@@ -369,10 +362,10 @@ class _VolunteerActivityPageState extends State<VolunteerActivityPage>
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.08),
+            color: const Color(0xFF008080).withValues(alpha: 0.04),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -456,10 +449,7 @@ class _VolunteerActivityPageState extends State<VolunteerActivityPage>
                     Expanded(
                       child: Text(
                         '${request.addressDetail}, ${_getDistrictName(request.district)}',
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: Colors.grey[700],
-                        ),
+                        style: TextStyle(fontSize: 13, color: Colors.grey[700]),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -516,10 +506,10 @@ class _VolunteerActivityPageState extends State<VolunteerActivityPage>
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.08),
+            color: const Color(0xFF008080).withValues(alpha: 0.04),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -536,7 +526,9 @@ class _VolunteerActivityPageState extends State<VolunteerActivityPage>
               // Cover image với gradient overlay
               if (campaign.coverImage != null)
                 ClipRRect(
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(24),
+                  ),
                   child: Stack(
                     children: [
                       Image.network(
@@ -546,9 +538,7 @@ class _VolunteerActivityPageState extends State<VolunteerActivityPage>
                         fit: BoxFit.cover,
                         errorBuilder: (context, error, stackTrace) => Container(
                           height: 180,
-                          decoration: BoxDecoration(
-                            color: Colors.grey[300],
-                          ),
+                          decoration: BoxDecoration(color: Colors.grey[300]),
                           child: const Icon(
                             Icons.campaign,
                             size: 50,
@@ -649,7 +639,8 @@ class _VolunteerActivityPageState extends State<VolunteerActivityPage>
                           const SizedBox(width: 8),
                           Expanded(
                             child: Text(
-                              campaign.organization!.organizationName ?? 'Tổ chức xã hội',
+                              campaign.organization!.organizationName ??
+                                  'Tổ chức xã hội',
                               style: TextStyle(
                                 fontSize: 13,
                                 color: Colors.grey[700],
@@ -703,7 +694,11 @@ class _VolunteerActivityPageState extends State<VolunteerActivityPage>
                       ),
                       child: Row(
                         children: [
-                          Icon(Icons.people, size: 18, color: spotsLeft > 0 ? Colors.green : Colors.red),
+                          Icon(
+                            Icons.people,
+                            size: 18,
+                            color: spotsLeft > 0 ? Colors.green : Colors.red,
+                          ),
                           const SizedBox(width: 6),
                           Text(
                             '${campaign.currentVolunteers}/${campaign.maxVolunteers}',
@@ -721,7 +716,11 @@ class _VolunteerActivityPageState extends State<VolunteerActivityPage>
                             ),
                           ),
                           const Spacer(),
-                          Icon(Icons.calendar_today, size: 16, color: Colors.grey[600]),
+                          Icon(
+                            Icons.calendar_today,
+                            size: 16,
+                            color: Colors.grey[600],
+                          ),
                           const SizedBox(width: 6),
                           Text(
                             _formatDate(campaign.startDate),
@@ -743,5 +742,4 @@ class _VolunteerActivityPageState extends State<VolunteerActivityPage>
       ),
     );
   }
-
 }

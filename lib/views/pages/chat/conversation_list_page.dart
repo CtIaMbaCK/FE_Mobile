@@ -66,9 +66,9 @@ class _ConversationListPageState extends State<ConversationListPage> {
         setState(() {
           _isLoading = false;
         });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Lỗi tải danh sách: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Lỗi tải danh sách: $e')));
       }
     }
   }
@@ -99,14 +99,14 @@ class _ConversationListPageState extends State<ConversationListPage> {
     return Scaffold(
       backgroundColor: const Color(0xFFF8FCFC),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF008080),
-        elevation: 0,
+        backgroundColor: Colors.white,
+        elevation: 1, // slight shadow for distinction
         title: const Text(
           'Tin nhắn',
           style: TextStyle(
-            color: Colors.white,
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
+            color: Colors.black87,
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
           ),
         ),
         actions: [
@@ -116,7 +116,10 @@ class _ConversationListPageState extends State<ConversationListPage> {
               padding: const EdgeInsets.only(right: 16),
               child: Center(
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.red,
                     borderRadius: BorderRadius.circular(12),
@@ -134,7 +137,7 @@ class _ConversationListPageState extends State<ConversationListPage> {
             ),
           // Search button
           IconButton(
-            icon: const Icon(Icons.search, color: Colors.white),
+            icon: const Icon(Icons.search, color: Colors.black87),
             onPressed: () async {
               final result = await showDialog<String>(
                 context: context,
@@ -158,14 +161,14 @@ class _ConversationListPageState extends State<ConversationListPage> {
         child: _isLoading
             ? const Center(child: CircularProgressIndicator())
             : _conversations.isEmpty
-                ? _buildEmptyState()
-                : ListView.builder(
-                    itemCount: _conversations.length,
-                    itemBuilder: (context, index) {
-                      final conversation = _conversations[index];
-                      return _buildConversationItem(conversation);
-                    },
-                  ),
+            ? _buildEmptyState()
+            : ListView.builder(
+                itemCount: _conversations.length,
+                itemBuilder: (context, index) {
+                  final conversation = _conversations[index];
+                  return _buildConversationItem(conversation);
+                },
+              ),
       ),
     );
   }
@@ -175,11 +178,7 @@ class _ConversationListPageState extends State<ConversationListPage> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.chat_bubble_outline,
-            size: 80,
-            color: Colors.grey[400],
-          ),
+          Icon(Icons.chat_bubble_outline, size: 80, color: Colors.grey[400]),
           const SizedBox(height: 16),
           Text(
             'Chưa có cuộc hội thoại nào',
@@ -192,10 +191,7 @@ class _ConversationListPageState extends State<ConversationListPage> {
           const SizedBox(height: 8),
           Text(
             'Nhấn nút tìm kiếm để bắt đầu chat',
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey[500],
-            ),
+            style: TextStyle(fontSize: 14, color: Colors.grey[500]),
           ),
         ],
       ),
@@ -220,14 +216,17 @@ class _ConversationListPageState extends State<ConversationListPage> {
 
     // Last message text
     String lastMessageText = lastMessage?.content ?? 'Chưa có tin nhắn';
-    bool isUnread = lastMessage != null &&
-                    !lastMessage.isRead &&
-                    lastMessage.senderId != otherUser.id;
+    bool isUnread =
+        lastMessage != null &&
+        !lastMessage.isRead &&
+        lastMessage.senderId != otherUser.id;
 
     // Time
     String timeText = '';
     if (conversation.lastMessageAt != null) {
-      timeText = DateTimeUtils.formatLastMessageTime(conversation.lastMessageAt!);
+      timeText = DateTimeUtils.formatLastMessageTime(
+        conversation.lastMessageAt!,
+      );
     }
 
     return InkWell(
@@ -236,9 +235,7 @@ class _ConversationListPageState extends State<ConversationListPage> {
         await Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => ChatRoomPage(
-              conversation: conversation,
-            ),
+            builder: (context) => ChatRoomPage(conversation: conversation),
           ),
         );
 
@@ -247,12 +244,18 @@ class _ConversationListPageState extends State<ConversationListPage> {
         _loadUnreadCount();
       },
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         decoration: BoxDecoration(
           color: Colors.white,
-          border: Border(
-            bottom: BorderSide(color: Colors.grey[200]!),
-          ),
+          borderRadius: BorderRadius.circular(24),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF008080).withValues(alpha: 0.04),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
         child: Row(
           children: [
@@ -318,9 +321,7 @@ class _ConversationListPageState extends State<ConversationListPage> {
                           lastMessageText,
                           style: TextStyle(
                             fontSize: 14,
-                            color: isUnread
-                                ? Colors.black87
-                                : Colors.grey[600],
+                            color: isUnread ? Colors.black87 : Colors.grey[600],
                             fontWeight: isUnread
                                 ? FontWeight.w600
                                 : FontWeight.normal,

@@ -46,9 +46,8 @@ class SettingsPage extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => VolunteerProfileEditForm(
-                      initialData: userData,
-                    ),
+                    builder: (context) =>
+                        VolunteerProfileEditForm(initialData: userData),
                   ),
                 );
               },
@@ -70,9 +69,7 @@ class SettingsPage extends StatelessWidget {
                   builder: (context) => AlertDialog(
                     title: Text(
                       'Xác nhận đăng xuất',
-                      style: GoogleFonts.roboto(
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: GoogleFonts.roboto(fontWeight: FontWeight.bold),
                     ),
                     content: const Text('Bạn có chắc chắn muốn đăng xuất?'),
                     actions: [
@@ -130,10 +127,10 @@ class SettingsPage extends StatelessWidget {
           padding: const EdgeInsets.all(18),
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(24),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.06),
+                color: const Color(0xFF008080).withValues(alpha: 0.04),
                 blurRadius: 10,
                 offset: const Offset(0, 4),
               ),
@@ -145,7 +142,9 @@ class SettingsPage extends StatelessWidget {
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: (iconColor ?? const Color(0xFF008080)).withValues(alpha: 0.12),
+                  color: (iconColor ?? const Color(0xFF008080)).withValues(
+                    alpha: 0.12,
+                  ),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(
@@ -166,11 +165,7 @@ class SettingsPage extends StatelessWidget {
                   ),
                 ),
               ),
-              Icon(
-                Icons.chevron_right,
-                size: 24,
-                color: Colors.grey.shade400,
-              ),
+              Icon(Icons.chevron_right, size: 24, color: Colors.grey.shade400),
             ],
           ),
         ),

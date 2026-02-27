@@ -55,12 +55,12 @@ class DistrictHelper {
     'TAN_PHU': 'Tân Phú',
     'PHU_NHUAN': 'Phú Nhuận',
     'BINH_TAN': 'Bình Tân',
-    'THU_DUC': 'Thủ Đức',
-    'HOC_MON': 'Hóc Môn',
-    'CU_CHI': 'Củ Chi',
-    'BINH_CHANH': 'Bình Chánh',
-    'NHA_BE': 'Nhà Bè',
-    'CAN_GIO': 'Cần Giờ',
+    'TP_THU_DUC': 'Thủ Đức',
+    'HUYEN_HOC_MON': 'Hóc Môn',
+    'HUYEN_CU_CHI': 'Củ Chi',
+    'HUYEN_BINH_CHANH': 'Bình Chánh',
+    'HUYEN_NHA_BE': 'Nhà Bè',
+    'HUYEN_CAN_GIO': 'Cần Giờ',
   };
 
   static String getDisplayName(String district) {

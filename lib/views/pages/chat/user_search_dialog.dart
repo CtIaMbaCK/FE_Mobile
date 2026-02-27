@@ -65,9 +65,9 @@ class _UserSearchDialogState extends State<UserSearchDialog> {
         setState(() {
           _isLoading = false;
         });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Lỗi tìm kiếm: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Lỗi tìm kiếm: $e')));
       }
     }
   }
@@ -78,13 +78,13 @@ class _UserSearchDialogState extends State<UserSearchDialog> {
       showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (context) => const Center(
-          child: CircularProgressIndicator(),
-        ),
+        builder: (context) => const Center(child: CircularProgressIndicator()),
       );
 
       // Tạo hoặc lấy conversation
-      final conversation = await _apiService.createOrGetConversation(user['id']);
+      final conversation = await _apiService.createOrGetConversation(
+        user['id'],
+      );
 
       // Đóng loading
       if (mounted) {
@@ -125,9 +125,7 @@ class _UserSearchDialogState extends State<UserSearchDialog> {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
       child: Container(
         height: MediaQuery.of(context).size.height * 0.7,
         padding: const EdgeInsets.all(16),
@@ -139,10 +137,7 @@ class _UserSearchDialogState extends State<UserSearchDialog> {
                 const Expanded(
                   child: Text(
                     'Tìm kiếm người dùng',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                 ),
                 IconButton(
@@ -160,7 +155,7 @@ class _UserSearchDialogState extends State<UserSearchDialog> {
                 hintText: 'Nhập tên, email hoặc số điện thoại...',
                 prefixIcon: const Icon(Icons.search),
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(24),
                 ),
                 contentPadding: const EdgeInsets.symmetric(
                   horizontal: 16,
@@ -179,9 +174,7 @@ class _UserSearchDialogState extends State<UserSearchDialog> {
             const SizedBox(height: 16),
 
             // Results
-            Expanded(
-              child: _buildResultsList(),
-            ),
+            Expanded(child: _buildResultsList()),
           ],
         ),
       ),
@@ -217,18 +210,11 @@ class _UserSearchDialogState extends State<UserSearchDialog> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(
-                    Icons.search,
-                    size: 64,
-                    color: Colors.grey[400],
-                  ),
+                  Icon(Icons.search, size: 64, color: Colors.grey[400]),
                   const SizedBox(height: 16),
                   Text(
                     'Tìm kiếm người dùng để bắt đầu chat',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey[600],
-                    ),
+                    style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                   ),
                 ],
               ),
@@ -249,18 +235,11 @@ class _UserSearchDialogState extends State<UserSearchDialog> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.person_off,
-              size: 64,
-              color: Colors.grey[400],
-            ),
+            Icon(Icons.person_off, size: 64, color: Colors.grey[400]),
             const SizedBox(height: 16),
             Text(
               'Không tìm thấy người dùng',
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey[600],
-              ),
+              style: TextStyle(fontSize: 14, color: Colors.grey[600]),
             ),
           ],
         ),
@@ -324,11 +303,18 @@ class _UserSearchDialogState extends State<UserSearchDialog> {
     return InkWell(
       onTap: () => _openChat(user),
       child: Container(
-        padding: const EdgeInsets.all(12),
-        margin: const EdgeInsets.only(bottom: 8),
+        padding: const EdgeInsets.all(16),
+        margin: const EdgeInsets.only(bottom: 12),
         decoration: BoxDecoration(
-          color: Colors.grey[100],
-          borderRadius: BorderRadius.circular(12),
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(24),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF008080).withValues(alpha: 0.04),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
         child: Row(
           children: [
@@ -336,7 +322,9 @@ class _UserSearchDialogState extends State<UserSearchDialog> {
             CircleAvatar(
               radius: 24,
               backgroundColor: const Color(0xFF008080),
-              backgroundImage: avatarUrl != null ? NetworkImage(avatarUrl) : null,
+              backgroundImage: avatarUrl != null
+                  ? NetworkImage(avatarUrl)
+                  : null,
               child: avatarUrl == null
                   ? Text(
                       displayName[0].toUpperCase(),
@@ -391,10 +379,7 @@ class _UserSearchDialogState extends State<UserSearchDialog> {
                   const SizedBox(height: 4),
                   Text(
                     user['phoneNumber'] ?? user['email'] ?? '',
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: Colors.grey[600],
-                    ),
+                    style: TextStyle(fontSize: 13, color: Colors.grey[600]),
                   ),
                 ],
               ),

@@ -95,7 +95,9 @@ class _HomePageState extends State<HomePage> {
     final campaigns = await service.getRecommendedCampaigns();
     if (!mounted) return;
     setState(() {
-      _topCampaigns = campaigns.take(2).toList(); // Chỉ lấy 2 chiến dịch mới nhất
+      _topCampaigns = campaigns
+          .take(2)
+          .toList(); // Chỉ lấy 2 chiến dịch mới nhất
       _isLoadingCampaigns = false;
     });
   }
@@ -133,7 +135,9 @@ class _HomePageState extends State<HomePage> {
     setState(() => _isSendingEmergency = true);
 
     try {
-      await _emergencyService.createEmergency(notes: 'Yêu cầu khẩn cấp từ trang chủ');
+      await _emergencyService.createEmergency(
+        notes: 'Yêu cầu khẩn cấp từ trang chủ',
+      );
 
       if (!mounted) return;
 
@@ -178,10 +182,19 @@ class _HomePageState extends State<HomePage> {
               // Header: Avatar & Name
               Container(
                 width: double.infinity,
-                color: Colors.white,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF008080).withValues(alpha: 0.04),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
                 padding: const EdgeInsets.symmetric(
                   horizontal: 20,
-                  vertical: 12,
+                  vertical: 16,
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -223,7 +236,7 @@ class _HomePageState extends State<HomePage> {
                                 const SizedBox(width: 10),
                                 Text(
                                   profile?.fullName ?? 'Người dùng',
-                                  style: GoogleFonts.interTight(
+                                  style: GoogleFonts.roboto(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w600,
                                   ),
@@ -234,7 +247,7 @@ class _HomePageState extends State<HomePage> {
                               user?.role == 'VOLUNTEER'
                                   ? 'Tình nguyện viên'
                                   : 'Người cần giúp đỡ',
-                              style: GoogleFonts.inter(
+                              style: GoogleFonts.roboto(
                                 fontSize: 12,
                                 color: Colors.grey,
                               ),
@@ -262,38 +275,55 @@ class _HomePageState extends State<HomePage> {
                   child: SizedBox(
                     width: double.infinity,
                     height: 100,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Color(0xFF008080),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        elevation: 4,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(
+                              0xFFEF4444,
+                            ).withValues(alpha: 0.15),
+                            blurRadius: 15,
+                            offset: const Offset(0, 6),
+                          ),
+                        ],
                       ),
-                      onPressed: _isSendingEmergency ? null : _sendEmergencySOS,
-                      child: _isSendingEmergency
-                          ? const CircularProgressIndicator(
-                              color: Colors.white,
-                            )
-                          : Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Icon(
-                                  Icons.warning_rounded,
-                                  color: Colors.white,
-                                  size: 28,
-                                ),
-                                const SizedBox(width: 12),
-                                Text(
-                                  'CUỘC GỌI KHẨN CẤP',
-                                  style: GoogleFonts.roboto(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(
+                            0xFFEF4444,
+                          ), // Soft red for emergency
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(24),
+                          ),
+                          elevation: 0,
+                        ),
+                        onPressed: _isSendingEmergency
+                            ? null
+                            : _sendEmergencySOS,
+                        child: _isSendingEmergency
+                            ? const CircularProgressIndicator(
+                                color: Colors.white,
+                              )
+                            : Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Icon(
+                                    Icons.warning_rounded,
                                     color: Colors.white,
+                                    size: 28,
                                   ),
-                                ),
-                              ],
-                            ),
+                                  const SizedBox(width: 12),
+                                  Text(
+                                    'CUỘC GỌI KHẨN CẤP',
+                                    style: GoogleFonts.roboto(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                      ),
                     ),
                   ),
                 ),
@@ -312,10 +342,11 @@ class _HomePageState extends State<HomePage> {
                         children: [
                           Text(
                             'Sự kiện đang diễn ra',
-                            style: GoogleFonts.interTight(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.black,
+                            style: GoogleFonts.roboto(
+                              fontSize: 22,
+                              fontWeight: FontWeight.w800,
+                              color: const Color(0xFF0F172A),
+                              letterSpacing: -0.5,
                             ),
                           ),
                           InkWell(
@@ -324,9 +355,8 @@ class _HomePageState extends State<HomePage> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => const ActivityPage(
-                                    initialTabIndex: 1,
-                                  ),
+                                  builder: (context) =>
+                                      const ActivityPage(initialTabIndex: 1),
                                 ),
                               );
                             },
@@ -334,7 +364,7 @@ class _HomePageState extends State<HomePage> {
                               children: [
                                 Text(
                                   'Xem tất cả',
-                                  style: GoogleFonts.inter(
+                                  style: GoogleFonts.roboto(
                                     fontSize: 14,
                                     fontWeight: FontWeight.bold,
                                     color: primaryColor,
@@ -360,29 +390,29 @@ class _HomePageState extends State<HomePage> {
                               ),
                             )
                           : _topCampaigns.isEmpty
-                              ? Center(
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(20),
-                                    child: Text(
-                                      'Chưa có chiến dịch nào',
-                                      style: GoogleFonts.inter(
-                                        fontSize: 14,
-                                        color: Colors.grey,
-                                      ),
-                                    ),
+                          ? Center(
+                              child: Padding(
+                                padding: const EdgeInsets.all(20),
+                                child: Text(
+                                  'Chưa có chiến dịch nào',
+                                  style: GoogleFonts.roboto(
+                                    fontSize: 14,
+                                    color: Colors.grey,
                                   ),
-                                )
-                              : Column(
-                                  children: _topCampaigns.map((campaign) {
-                                    return Column(
-                                      children: [
-                                        _buildCampaignCard(campaign),
-                                        if (campaign != _topCampaigns.last)
-                                          const SizedBox(height: 12),
-                                      ],
-                                    );
-                                  }).toList(),
                                 ),
+                              ),
+                            )
+                          : Column(
+                              children: _topCampaigns.map((campaign) {
+                                return Column(
+                                  children: [
+                                    _buildCampaignCard(campaign),
+                                    if (campaign != _topCampaigns.last)
+                                      const SizedBox(height: 12),
+                                  ],
+                                );
+                              }).toList(),
+                            ),
                     ],
                   ),
                 ),
@@ -403,13 +433,13 @@ class _HomePageState extends State<HomePage> {
                         children: [
                           Text(
                             'Vinh danh Tổ Chức Xã Hội',
-                            style: GoogleFonts.interTight(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
+                            style: GoogleFonts.roboto(
+                              fontSize: 22,
+                              fontWeight: FontWeight.w800,
+                              color: const Color(0xFF0F172A),
+                              letterSpacing: -0.5,
                             ),
                           ),
-
                           InkWell(
                             onTap: () {
                               Navigator.push(
@@ -426,7 +456,7 @@ class _HomePageState extends State<HomePage> {
                               children: [
                                 Text(
                                   'Xem tất cả',
-                                  style: GoogleFonts.interTight(
+                                  style: GoogleFonts.roboto(
                                     fontSize: 14,
                                     fontWeight: FontWeight.bold,
                                     color: Color(0xff008080),
@@ -452,34 +482,34 @@ class _HomePageState extends State<HomePage> {
                                 ),
                               )
                             : _topOrganizations.isEmpty
-                                ? Center(
-                                    child: Text(
-                                      'Chưa có dữ liệu',
-                                      style: GoogleFonts.inter(
-                                        fontSize: 14,
-                                        color: Colors.grey,
-                                      ),
-                                    ),
-                                  )
-                                : ListView.builder(
-                                    itemCount: _topOrganizations.length,
-                                    itemBuilder: (context, index) {
-                                      final org = _topOrganizations[index];
-                                      return InkWell(
-                                        onTap: () {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) {
-                                                return OrganizationHonor();
-                                              },
-                                            ),
-                                          );
-                                        },
-                                        child: buildOrganizationHonorCard(org),
+                            ? Center(
+                                child: Text(
+                                  'Chưa có dữ liệu',
+                                  style: GoogleFonts.roboto(
+                                    fontSize: 14,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                              )
+                            : ListView.builder(
+                                itemCount: _topOrganizations.length,
+                                itemBuilder: (context, index) {
+                                  final org = _topOrganizations[index];
+                                  return InkWell(
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) {
+                                            return OrganizationHonor();
+                                          },
+                                        ),
                                       );
                                     },
-                                  ),
+                                    child: buildOrganizationHonorCard(org),
+                                  );
+                                },
+                              ),
                       ),
                     ],
                   ),
@@ -498,9 +528,10 @@ class _HomePageState extends State<HomePage> {
                       Text(
                         'Vinh danh Tình Nguyện Viên',
                         style: GoogleFonts.roboto(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
+                          fontSize: 22,
+                          fontWeight: FontWeight.w800,
+                          color: const Color(0xFF0F172A),
+                          letterSpacing: -0.5,
                         ),
                       ),
 
@@ -514,26 +545,26 @@ class _HomePageState extends State<HomePage> {
                                 ),
                               )
                             : _topVolunteers.isEmpty
-                                ? Center(
-                                    child: Text(
-                                      'Chưa có dữ liệu',
-                                      style: GoogleFonts.inter(
-                                        fontSize: 14,
-                                        color: Colors.grey,
-                                      ),
-                                    ),
-                                  )
-                                : ListView.builder(
-                                    physics: NeverScrollableScrollPhysics(),
-                                    itemCount: _topVolunteers.length,
-                                    itemBuilder: (context, index) {
-                                      final volunteer = _topVolunteers[index];
-                                      return buildVolunteerHonorCard(
-                                        volunteer,
-                                        rank: index + 1,
-                                      );
-                                    },
+                            ? Center(
+                                child: Text(
+                                  'Chưa có dữ liệu',
+                                  style: GoogleFonts.roboto(
+                                    fontSize: 14,
+                                    color: Colors.grey,
                                   ),
+                                ),
+                              )
+                            : ListView.builder(
+                                physics: NeverScrollableScrollPhysics(),
+                                itemCount: _topVolunteers.length,
+                                itemBuilder: (context, index) {
+                                  final volunteer = _topVolunteers[index];
+                                  return buildVolunteerHonorCard(
+                                    volunteer,
+                                    rank: index + 1,
+                                  );
+                                },
+                              ),
                       ),
                     ],
                   ),
@@ -552,10 +583,11 @@ class _HomePageState extends State<HomePage> {
                       children: [
                         Text(
                           'Blog và Tin tức',
-                          style: GoogleFonts.interTight(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.black,
+                          style: GoogleFonts.roboto(
+                            fontSize: 22,
+                            fontWeight: FontWeight.w800,
+                            color: const Color(0xFF0F172A),
+                            letterSpacing: -0.5,
                           ),
                         ),
 
@@ -576,7 +608,7 @@ class _HomePageState extends State<HomePage> {
                                 children: [
                                   Text(
                                     'Xem tất cả',
-                                    style: GoogleFonts.inter(
+                                    style: GoogleFonts.roboto(
                                       fontSize: 14,
                                       fontWeight: FontWeight.bold,
                                       color: primaryColor,
@@ -604,42 +636,45 @@ class _HomePageState extends State<HomePage> {
                             ),
                           )
                         : _topBlogs.isEmpty
-                            ? Center(
-                                child: Text(
-                                  'Chưa có dữ liệu',
-                                  style: GoogleFonts.inter(
-                                    fontSize: 14,
-                                    color: Colors.grey,
-                                  ),
-                                ),
-                              )
-                            : Column(
-                                children: _topBlogs.map((blog) {
-                                  return Column(
-                                    children: [
-                                      InkWell(
-                                        onTap: () {
-                                          // Navigate to blog detail (chưa có page)
-                                          // Navigator.push(context, MaterialPageRoute(
-                                          //   builder: (context) => BlogDetailPage(blogId: blog.id),
-                                          // ));
-                                        },
-                                        child: buildBlogItem(
-                                          imageUrl: blog.coverImage ??
-                                              'https://images.unsplash.com/photo-1600818272779-cfa6145222f0?fit=crop&w=200',
-                                          title: blog.title,
-                                          desc: blog.content != null && blog.content!.length > 100
-                                              ? '${blog.content!.substring(0, 100)}...'
-                                              : blog.content ?? 'Chưa có mô tả',
-                                          time: _formatTime(blog.createdAt),
-                                        ),
-                                      ),
-                                      if (blog != _topBlogs.last)
-                                        const SizedBox(height: 12),
-                                    ],
-                                  );
-                                }).toList(),
+                        ? Center(
+                            child: Text(
+                              'Chưa có dữ liệu',
+                              style: GoogleFonts.roboto(
+                                fontSize: 14,
+                                color: Colors.grey,
                               ),
+                            ),
+                          )
+                        : Column(
+                            children: _topBlogs.map((blog) {
+                              return Column(
+                                children: [
+                                  InkWell(
+                                    onTap: () {
+                                      // Navigate to blog detail (chưa có page)
+                                      // Navigator.push(context, MaterialPageRoute(
+                                      //   builder: (context) => BlogDetailPage(blogId: blog.id),
+                                      // ));
+                                    },
+                                    child: buildBlogItem(
+                                      imageUrl:
+                                          blog.coverImage ??
+                                          'https://images.unsplash.com/photo-1600818272779-cfa6145222f0?fit=crop&w=200',
+                                      title: blog.title,
+                                      desc:
+                                          blog.content != null &&
+                                              blog.content!.length > 100
+                                          ? '${blog.content!.substring(0, 100)}...'
+                                          : blog.content ?? 'Chưa có mô tả',
+                                      time: _formatTime(blog.createdAt),
+                                    ),
+                                  ),
+                                  if (blog != _topBlogs.last)
+                                    const SizedBox(height: 12),
+                                ],
+                              );
+                            }).toList(),
+                          ),
                   ],
                 ),
               ),
@@ -673,11 +708,11 @@ class _HomePageState extends State<HomePage> {
       width: double.infinity,
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
+            color: const Color(0xFF008080).withValues(alpha: 0.04),
             blurRadius: 10,
-            color: Colors.black.withValues(alpha: 0.08),
             offset: const Offset(0, 4),
           ),
         ],
@@ -697,7 +732,7 @@ class _HomePageState extends State<HomePage> {
               if (campaign.coverImage != null)
                 ClipRRect(
                   borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(16),
+                    top: Radius.circular(24),
                   ),
                   child: Stack(
                     children: [
@@ -708,9 +743,7 @@ class _HomePageState extends State<HomePage> {
                         fit: BoxFit.cover,
                         errorBuilder: (context, error, stackTrace) => Container(
                           height: 160,
-                          decoration: BoxDecoration(
-                            color: Colors.grey[300],
-                          ),
+                          decoration: BoxDecoration(color: Colors.grey[300]),
                           child: const Icon(
                             Icons.campaign,
                             size: 50,
@@ -770,7 +803,7 @@ class _HomePageState extends State<HomePage> {
                     // Title
                     Text(
                       campaign.title,
-                      style: GoogleFonts.interTight(
+                      style: GoogleFonts.roboto(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                         height: 1.3,
@@ -799,7 +832,7 @@ class _HomePageState extends State<HomePage> {
                         Expanded(
                           child: Text(
                             _getDistrictName(campaign.district),
-                            style: GoogleFonts.inter(
+                            style: GoogleFonts.roboto(
                               fontSize: 12,
                               color: Colors.grey[700],
                             ),
@@ -842,7 +875,11 @@ class _HomePageState extends State<HomePage> {
                             ),
                           ),
                           const Spacer(),
-                          Icon(Icons.calendar_today, size: 14, color: Colors.grey[600]),
+                          Icon(
+                            Icons.calendar_today,
+                            size: 14,
+                            color: Colors.grey[600],
+                          ),
                           const SizedBox(width: 6),
                           Text(
                             _formatDate(campaign.startDate),

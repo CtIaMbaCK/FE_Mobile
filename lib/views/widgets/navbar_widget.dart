@@ -30,7 +30,7 @@ class NavbarWidget extends StatelessWidget {
               }
               return const TextStyle(color: Colors.grey, fontSize: 12);
             }),
-            indicatorColor: activeColor.withOpacity(0.1),
+            indicatorColor: activeColor.withValues(alpha: 0.1),
           ),
 
           // --- BẮT ĐẦU SỬA TỪ ĐÂY ---
@@ -72,7 +72,7 @@ class NavbarWidget extends StatelessWidget {
                     }
                   },
                   selectedIndex: selectedPage,
-                  backgroundColor: activeColor.withOpacity(0.1),
+                  backgroundColor: activeColor.withValues(alpha: 0.1),
                   elevation: 3,
                 ),
 
@@ -90,7 +90,7 @@ class NavbarWidget extends StatelessWidget {
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
-                            color: activeColor.withOpacity(0.4),
+                            color: activeColor.withValues(alpha: 0.4),
                             blurRadius: 10,
                             offset: const Offset(0, 5),
                           ),
@@ -103,7 +103,7 @@ class NavbarWidget extends StatelessWidget {
                             : Icons.map,
                         color: selectedPage == 2
                             ? Colors.white
-                            : Colors.white.withOpacity(0.8),
+                            : Colors.white.withValues(alpha: 0.8),
                         size: 30,
                       ),
                     ),

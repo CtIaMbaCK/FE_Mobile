@@ -9,10 +9,7 @@ import '../../../utils/date_utils.dart';
 class ChatRoomPage extends StatefulWidget {
   final ConversationModel conversation;
 
-  const ChatRoomPage({
-    super.key,
-    required this.conversation,
-  });
+  const ChatRoomPage({super.key, required this.conversation});
 
   @override
   State<ChatRoomPage> createState() => _ChatRoomPageState();
@@ -95,9 +92,9 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
         setState(() {
           _isLoading = false;
         });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Lỗi tải tin nhắn: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Lỗi tải tin nhắn: $e')));
       }
     }
   }
@@ -204,18 +201,20 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
     return Scaffold(
       backgroundColor: const Color(0xFFF8FCFC),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF008080),
-        elevation: 0,
+        backgroundColor: Colors.white,
+        elevation: 1, // slight shadow for distinction
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: const Icon(Icons.arrow_back, color: Colors.black87),
           onPressed: () => Navigator.pop(context),
         ),
         title: Row(
           children: [
             CircleAvatar(
               radius: 18,
-              backgroundColor: Colors.white,
-              backgroundImage: avatarUrl != null ? NetworkImage(avatarUrl) : null,
+              backgroundColor: const Color(0xFF008080).withValues(alpha: 0.1),
+              backgroundImage: avatarUrl != null
+                  ? NetworkImage(avatarUrl)
+                  : null,
               child: avatarUrl == null
                   ? Text(
                       displayName[0].toUpperCase(),
@@ -235,9 +234,9 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                   Text(
                     displayName,
                     style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
+                      color: Colors.black87,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                   // if (_isOtherUserTyping)
@@ -257,7 +256,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
           // Menu 3 chấm - chỉ hiện khi không phải Admin
           if (otherUser.role != 'ADMIN')
             PopupMenuButton<String>(
-              icon: const Icon(Icons.more_vert, color: Colors.white),
+              icon: const Icon(Icons.more_vert, color: Colors.black87),
               onSelected: (value) async {
                 if (value == 'info') {
                   _showUserInfo();
@@ -294,15 +293,15 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                           Icon(Icons.group_add),
                           SizedBox(width: 12),
                           Text('Tham gia TCXH'),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                );
-              }
+                  );
+                }
 
-              return items;
-            },
-          ),
+                return items;
+              },
+            ),
         ],
       ),
       body: Column(
@@ -312,15 +311,15 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
             child: _isLoading
                 ? const Center(child: CircularProgressIndicator())
                 : _messages.isEmpty
-                    ? _buildEmptyState()
-                    : ListView.builder(
-                        controller: _scrollController,
-                        padding: const EdgeInsets.all(16),
-                        itemCount: _messages.length,
-                        itemBuilder: (context, index) {
-                          return _buildMessageBubble(_messages[index]);
-                        },
-                      ),
+                ? _buildEmptyState()
+                : ListView.builder(
+                    controller: _scrollController,
+                    padding: const EdgeInsets.all(16),
+                    itemCount: _messages.length,
+                    itemBuilder: (context, index) {
+                      return _buildMessageBubble(_messages[index]);
+                    },
+                  ),
           ),
 
           // Typing indicator
@@ -329,7 +328,10 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               alignment: Alignment.centerLeft,
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.grey[300],
                   borderRadius: BorderRadius.circular(18),
@@ -348,9 +350,9 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
               color: Colors.white,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
+                  color: const Color(0xFF008080).withValues(alpha: 0.04),
                   blurRadius: 10,
-                  offset: const Offset(0, -2),
+                  offset: const Offset(0, -4),
                 ),
               ],
             ),
@@ -412,26 +414,16 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.chat_bubble_outline,
-            size: 80,
-            color: Colors.grey[400],
-          ),
+          Icon(Icons.chat_bubble_outline, size: 80, color: Colors.grey[400]),
           const SizedBox(height: 16),
           Text(
             'Chưa có tin nhắn nào',
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.grey[600],
-            ),
+            style: TextStyle(fontSize: 16, color: Colors.grey[600]),
           ),
           const SizedBox(height: 8),
           Text(
             'Gửi tin nhắn đầu tiên!',
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey[500],
-            ),
+            style: TextStyle(fontSize: 14, color: Colors.grey[500]),
           ),
         ],
       ),
@@ -454,10 +446,14 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
         decoration: BoxDecoration(
           color: isMe ? const Color(0xFF008080) : Colors.grey[300],
           borderRadius: BorderRadius.only(
-            topLeft: const Radius.circular(18),
-            topRight: const Radius.circular(18),
-            bottomLeft: isMe ? const Radius.circular(18) : const Radius.circular(4),
-            bottomRight: isMe ? const Radius.circular(4) : const Radius.circular(18),
+            topLeft: const Radius.circular(24),
+            topRight: const Radius.circular(24),
+            bottomLeft: isMe
+                ? const Radius.circular(24)
+                : const Radius.circular(4),
+            bottomRight: isMe
+                ? const Radius.circular(4)
+                : const Radius.circular(24),
           ),
         ),
         child: Column(
@@ -486,7 +482,9 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                   Icon(
                     message.isRead ? Icons.done_all : Icons.done,
                     size: 14,
-                    color: message.isRead ? Colors.lightBlueAccent : Colors.white70,
+                    color: message.isRead
+                        ? Colors.lightBlueAccent
+                        : Colors.white70,
                   ),
                 ],
               ],
@@ -513,10 +511,14 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
 
     // Role badge
     Map<String, dynamic> getRoleBadge() {
-      if (otherUser.role == 'VOLUNTEER') return {'text': 'TNV', 'color': Colors.green};
-      if (otherUser.role == 'BENEFICIARY') return {'text': 'NCGĐ', 'color': Colors.orange};
-      if (otherUser.role == 'ORGANIZATION') return {'text': 'TCXH', 'color': Colors.blue};
-      if (otherUser.role == 'ADMIN') return {'text': 'ADMIN', 'color': Colors.red};
+      if (otherUser.role == 'VOLUNTEER')
+        return {'text': 'TNV', 'color': Colors.green};
+      if (otherUser.role == 'BENEFICIARY')
+        return {'text': 'NCGĐ', 'color': Colors.orange};
+      if (otherUser.role == 'ORGANIZATION')
+        return {'text': 'TCXH', 'color': Colors.blue};
+      if (otherUser.role == 'ADMIN')
+        return {'text': 'ADMIN', 'color': Colors.red};
       return {'text': 'USER', 'color': Colors.grey};
     }
 
@@ -552,11 +554,17 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                 children: [
                   Text(
                     displayName,
-                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   Container(
                     margin: const EdgeInsets.only(top: 4),
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 2,
+                    ),
                     decoration: BoxDecoration(
                       color: badge['color'],
                       borderRadius: BorderRadius.circular(4),
@@ -584,7 +592,11 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
 
               // Số điện thoại
               if (otherUser.phoneNumber != null) ...[
-                _buildInfoRow(Icons.phone_outlined, 'Số điện thoại', otherUser.phoneNumber!),
+                _buildInfoRow(
+                  Icons.phone_outlined,
+                  'Số điện thoại',
+                  otherUser.phoneNumber!,
+                ),
                 const SizedBox(height: 12),
               ],
 
@@ -592,13 +604,21 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
               if (profile != null) ...[
                 // TNV/NCGĐ
                 if (profile.fullName != null) ...[
-                  _buildInfoRow(Icons.person_outline, 'Họ tên', profile.fullName!),
+                  _buildInfoRow(
+                    Icons.person_outline,
+                    'Họ tên',
+                    profile.fullName!,
+                  ),
                   const SizedBox(height: 12),
                 ],
 
                 // TCXH
                 if (profile.organizationName != null) ...[
-                  _buildInfoRow(Icons.business_outlined, 'Tên tổ chức', profile.organizationName!),
+                  _buildInfoRow(
+                    Icons.business_outlined,
+                    'Tên tổ chức',
+                    profile.organizationName!,
+                  ),
                   const SizedBox(height: 12),
                 ],
 
@@ -610,8 +630,8 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                     profile.organizationStatus == 'PENDING'
                         ? 'Chờ duyệt'
                         : profile.organizationStatus == 'ACTIVE'
-                            ? 'Đã tham gia'
-                            : profile.organizationStatus ?? 'Chưa tham gia',
+                        ? 'Đã tham gia'
+                        : profile.organizationStatus ?? 'Chưa tham gia',
                   ),
                 ],
               ],
@@ -670,7 +690,9 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Tham gia TCXH'),
-        content: const Text('Bạn có muốn gửi yêu cầu tham gia tổ chức này không?'),
+        content: const Text(
+          'Bạn có muốn gửi yêu cầu tham gia tổ chức này không?',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
@@ -701,10 +723,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
       } catch (e) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Lỗi: $e'),
-              backgroundColor: Colors.red,
-            ),
+            SnackBar(content: Text('Lỗi: $e'), backgroundColor: Colors.red),
           );
         }
       }

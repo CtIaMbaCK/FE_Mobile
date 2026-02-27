@@ -38,17 +38,18 @@ class GlassMorphismCard extends StatelessWidget {
             padding: padding ?? const EdgeInsets.all(20),
             decoration: BoxDecoration(
               color: backgroundColor ?? Color.fromRGBO(255, 255, 255, opacity),
-              borderRadius: BorderRadius.circular(borderRadius ?? 16),
-              border: border ??
+              borderRadius: BorderRadius.circular(borderRadius ?? 24),
+              border:
+                  border ??
                   Border.all(
                     color: const Color.fromRGBO(255, 255, 255, 0.2),
                     width: 1.5,
                   ),
               boxShadow: [
                 BoxShadow(
-                  color: const Color.fromRGBO(0, 0, 0, 0.05),
-                  blurRadius: 20,
-                  offset: const Offset(0, 10),
+                  color: const Color(0xFF008080).withValues(alpha: 0.04),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
                 ),
               ],
             ),
@@ -75,13 +76,11 @@ class ShimmerLoading extends StatelessWidget {
     this.shape,
   });
 
-  const ShimmerLoading.circular({
-    super.key,
-    required double size,
-  })  : width = size,
-        height = size,
-        borderRadius = null,
-        shape = const CircleBorder();
+  const ShimmerLoading.circular({super.key, required double size})
+    : width = size,
+      height = size,
+      borderRadius = null,
+      shape = const CircleBorder();
 
   const ShimmerLoading.rectangular({
     super.key,
@@ -100,9 +99,10 @@ class ShimmerLoading extends StatelessWidget {
         height: height,
         decoration: ShapeDecoration(
           color: Colors.white,
-          shape: shape ??
+          shape:
+              shape ??
               RoundedRectangleBorder(
-                borderRadius: borderRadius ?? BorderRadius.circular(8),
+                borderRadius: borderRadius ?? BorderRadius.circular(16),
               ),
         ),
       ),
@@ -299,30 +299,29 @@ class FadeSlidePageRoute<T> extends PageRouteBuilder<T> {
   final Widget page;
 
   FadeSlidePageRoute({required this.page})
-      : super(
-          pageBuilder: (context, animation, secondaryAnimation) => page,
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            const begin = Offset(0.0, 0.05);
-            const end = Offset.zero;
-            const curve = Curves.easeInOut;
+    : super(
+        pageBuilder: (context, animation, secondaryAnimation) => page,
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          const begin = Offset(0.0, 0.05);
+          const end = Offset.zero;
+          const curve = Curves.easeInOut;
 
-            var tween =
-                Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-            var offsetAnimation = animation.drive(tween);
+          var tween = Tween(
+            begin: begin,
+            end: end,
+          ).chain(CurveTween(curve: curve));
+          var offsetAnimation = animation.drive(tween);
 
-            var fadeTween = Tween<double>(begin: 0.0, end: 1.0);
-            var fadeAnimation = animation.drive(fadeTween);
+          var fadeTween = Tween<double>(begin: 0.0, end: 1.0);
+          var fadeAnimation = animation.drive(fadeTween);
 
-            return SlideTransition(
-              position: offsetAnimation,
-              child: FadeTransition(
-                opacity: fadeAnimation,
-                child: child,
-              ),
-            );
-          },
-          transitionDuration: const Duration(milliseconds: 300),
-        );
+          return SlideTransition(
+            position: offsetAnimation,
+            child: FadeTransition(opacity: fadeAnimation, child: child),
+          );
+        },
+        transitionDuration: const Duration(milliseconds: 300),
+      );
 }
 
 /// Staggered Animation cho list items
@@ -359,18 +358,12 @@ class _StaggeredListItemState extends State<StaggeredListItem>
     _slideAnimation = Tween<Offset>(
       begin: const Offset(0, 0.1),
       end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _controller,
-      curve: Curves.easeOut,
-    ));
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
 
     _fadeAnimation = Tween<double>(
       begin: 0.0,
       end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _controller,
-      curve: Curves.easeIn,
-    ));
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeIn));
 
     // Delay dựa trên index
     Future.delayed(Duration(milliseconds: widget.index * widget.delay), () {
@@ -390,10 +383,7 @@ class _StaggeredListItemState extends State<StaggeredListItem>
   Widget build(BuildContext context) {
     return SlideTransition(
       position: _slideAnimation,
-      child: FadeTransition(
-        opacity: _fadeAnimation,
-        child: widget.child,
-      ),
+      child: FadeTransition(opacity: _fadeAnimation, child: widget.child),
     );
   }
 }

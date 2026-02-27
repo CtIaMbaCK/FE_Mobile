@@ -273,7 +273,7 @@ class _VolunteerProfileViewState extends State<VolunteerProfileView>
             shape: BoxShape.circle,
             boxShadow: [
               BoxShadow(
-                color: const Color(0xFF008080).withOpacity(0.2),
+                color: const Color(0xFF008080).withValues(alpha: 0.2),
                 blurRadius: 24,
                 offset: const Offset(0, 8),
               ),
@@ -314,7 +314,7 @@ class _VolunteerProfileViewState extends State<VolunteerProfileView>
     return GlassMorphismCard(
       margin: const EdgeInsets.symmetric(horizontal: 24),
       padding: const EdgeInsets.all(24),
-      backgroundColor: Colors.white.withOpacity(0.95),
+      backgroundColor: Colors.white.withValues(alpha: 0.95),
       blur: 15,
       child: Column(
         children: [
@@ -332,7 +332,7 @@ class _VolunteerProfileViewState extends State<VolunteerProfileView>
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             decoration: BoxDecoration(
-              color: const Color(0xFF008080).withOpacity(0.1),
+              color: const Color(0xFF008080).withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(20),
             ),
             child: Row(
@@ -362,12 +362,12 @@ class _VolunteerProfileViewState extends State<VolunteerProfileView>
               color: const Color(0xFFF8FCFC),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: const Color(0xFF008080).withOpacity(0.1),
+                color: const Color(0xFF008080).withValues(alpha: 0.1),
               ),
             ),
             child: Text(
               bio,
-              style: GoogleFonts.inter(
+              style: GoogleFonts.roboto(
                 fontSize: 15,
                 color: Colors.grey[700],
                 height: 1.6,
@@ -390,7 +390,7 @@ class _VolunteerProfileViewState extends State<VolunteerProfileView>
   }) {
     return GlassMorphismCard(
       padding: const EdgeInsets.all(20),
-      backgroundColor: Colors.white.withOpacity(0.95),
+      backgroundColor: Colors.white.withValues(alpha: 0.95),
       blur: 15,
       child: Column(
         children: [
@@ -402,7 +402,7 @@ class _VolunteerProfileViewState extends State<VolunteerProfileView>
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
-                  color: iconColor.withOpacity(0.3),
+                  color: iconColor.withValues(alpha: 0.3),
                   blurRadius: 12,
                   offset: const Offset(0, 4),
                 ),
@@ -440,7 +440,7 @@ class _VolunteerProfileViewState extends State<VolunteerProfileView>
           // Label nhỏ
           Text(
             label,
-            style: GoogleFonts.inter(
+            style: GoogleFonts.roboto(
               fontSize: 13,
               color: Colors.grey[600],
               fontWeight: FontWeight.w500,

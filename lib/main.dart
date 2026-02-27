@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:mobile/data/notifiers.dart';
 import 'package:mobile/views/widget_tree.dart'; // Import file WidgetTree vừa sửa
 
@@ -29,6 +30,7 @@ class _MyAppState extends State<MyApp> {
               seedColor: const Color(0xff008080),
               brightness: isLightMode ? Brightness.light : Brightness.dark,
             ),
+            textTheme: GoogleFonts.robotoTextTheme(),
             useMaterial3: true,
           ),
           // SỬA Ở ĐÂY: Trỏ về WidgetTree để kiểm tra đăng nhập trước

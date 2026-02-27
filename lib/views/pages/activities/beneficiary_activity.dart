@@ -115,11 +115,15 @@ class _BeneficiaryActivityPageState extends State<BeneficiaryActivityPage> {
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
                 color: Colors.white,
+                borderRadius: const BorderRadius.only(
+                  bottomLeft: Radius.circular(24),
+                  bottomRight: Radius.circular(24),
+                ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.05),
+                    color: const Color(0xFF008080).withValues(alpha: 0.04),
                     blurRadius: 10,
-                    offset: const Offset(0, 2),
+                    offset: const Offset(0, 4),
                   ),
                 ],
               ),
@@ -231,13 +235,17 @@ class _BeneficiaryActivityPageState extends State<BeneficiaryActivityPage> {
                           Container(
                             padding: const EdgeInsets.all(24),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF008080).withValues(alpha: 0.1),
+                              color: const Color(
+                                0xFF008080,
+                              ).withValues(alpha: 0.1),
                               shape: BoxShape.circle,
                             ),
                             child: Icon(
                               Icons.assignment_outlined,
                               size: 64,
-                              color: const Color(0xFF008080).withValues(alpha: 0.5),
+                              color: const Color(
+                                0xFF008080,
+                              ).withValues(alpha: 0.5),
                             ),
                           ),
                           const SizedBox(height: 20),
@@ -334,10 +342,10 @@ class _BeneficiaryActivityPageState extends State<BeneficiaryActivityPage> {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.08),
+            color: const Color(0xFF008080).withValues(alpha: 0.04),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -455,7 +463,8 @@ class _BeneficiaryActivityPageState extends State<BeneficiaryActivityPage> {
                             bool? updated = await Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => NewHelpPage(request: item),
+                                builder: (context) =>
+                                    NewHelpPage(request: item),
                               ),
                             );
                             if (updated == true) setState(() {});
@@ -516,7 +525,8 @@ class _BeneficiaryActivityPageState extends State<BeneficiaryActivityPage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => RequestDetailPage(request: item),
+                            builder: (context) =>
+                                RequestDetailPage(request: item),
                           ),
                         );
                       },
@@ -626,10 +636,7 @@ class _BeneficiaryActivityPageState extends State<BeneficiaryActivityPage> {
                   icon: const Icon(Icons.info_outline, size: 18),
                   label: const Text(
                     'Xem chi tiết',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
-                    ),
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                   ),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: const Color(0xFF008080),

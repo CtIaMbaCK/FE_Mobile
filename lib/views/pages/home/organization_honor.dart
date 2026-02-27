@@ -78,9 +78,9 @@ class _OrganizationHonorState extends State<OrganizationHonor> {
     } catch (e) {
       setState(() => _isLoading = false);
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Lỗi tải dữ liệu: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Lỗi tải dữ liệu: $e')));
       }
     }
   }
@@ -113,10 +113,7 @@ class _OrganizationHonorState extends State<OrganizationHonor> {
         ),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(1),
-          child: Container(
-            color: Colors.grey[200],
-            height: 1,
-          ),
+          child: Container(color: Colors.grey[200], height: 1),
         ),
       ),
       body: Column(
@@ -133,7 +130,10 @@ class _OrganizationHonorState extends State<OrganizationHonor> {
                   decoration: InputDecoration(
                     hintText: 'Tìm kiếm tổ chức...',
                     hintStyle: GoogleFonts.roboto(color: Colors.grey),
-                    prefixIcon: const Icon(Icons.search, color: Color(0xFF008080)),
+                    prefixIcon: const Icon(
+                      Icons.search,
+                      color: Color(0xFF008080),
+                    ),
                     suffixIcon: _searchQuery.isNotEmpty
                         ? IconButton(
                             icon: const Icon(Icons.clear, color: Colors.grey),
@@ -144,9 +144,9 @@ class _OrganizationHonorState extends State<OrganizationHonor> {
                           )
                         : null,
                     filled: true,
-                    fillColor: const Color(0xFFF0F0F0),
+                    fillColor: Colors.white,
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(20),
                       borderSide: BorderSide.none,
                     ),
                     contentPadding: const EdgeInsets.symmetric(
@@ -180,12 +180,12 @@ class _OrganizationHonorState extends State<OrganizationHonor> {
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(24),
               boxShadow: [
                 BoxShadow(
-                  color: const Color(0xFF008080).withValues(alpha: 0.3),
-                  blurRadius: 8,
-                  offset: const Offset(0, 4),
+                  color: const Color(0xFF008080).withValues(alpha: 0.2),
+                  blurRadius: 20,
+                  offset: const Offset(0, 10),
                 ),
               ],
             ),
@@ -234,67 +234,63 @@ class _OrganizationHonorState extends State<OrganizationHonor> {
           // Organizations list
           Expanded(
             child: _isLoading && _organizations.isEmpty
+                ? Center(child: CircularProgressIndicator(color: primaryColor))
+                : _organizations.isEmpty
                 ? Center(
-                    child: CircularProgressIndicator(
-                      color: primaryColor,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.business_outlined,
+                          size: 64,
+                          color: Colors.grey[400],
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'Chưa có tổ chức',
+                          style: GoogleFonts.roboto(
+                            fontSize: 16,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                      ],
                     ),
                   )
-                : _organizations.isEmpty
-                    ? Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.business_outlined,
-                              size: 64,
-                              color: Colors.grey[400],
-                            ),
-                            const SizedBox(height: 16),
-                            Text(
-                              'Chưa có tổ chức',
-                              style: GoogleFonts.roboto(
-                                fontSize: 16,
-                                color: Colors.grey[600],
+                : RefreshIndicator(
+                    onRefresh: () => _loadOrganizations(refresh: true),
+                    color: primaryColor,
+                    child: ListView.builder(
+                      padding: const EdgeInsets.all(16),
+                      itemCount: _organizations.length + (_hasMore ? 1 : 0),
+                      itemBuilder: (context, index) {
+                        if (index == _organizations.length) {
+                          // Load more indicator
+                          if (_isLoading) {
+                            return Center(
+                              child: Padding(
+                                padding: const EdgeInsets.all(16),
+                                child: CircularProgressIndicator(
+                                  color: primaryColor,
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
-                      )
-                    : RefreshIndicator(
-                        onRefresh: () => _loadOrganizations(refresh: true),
-                        color: primaryColor,
-                        child: ListView.builder(
-                          padding: const EdgeInsets.all(16),
-                          itemCount: _organizations.length + (_hasMore ? 1 : 0),
-                          itemBuilder: (context, index) {
-                            if (index == _organizations.length) {
-                              // Load more indicator
-                              if (_isLoading) {
-                                return Center(
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(16),
-                                    child: CircularProgressIndicator(
-                                      color: primaryColor,
-                                    ),
-                                  ),
-                                );
-                              } else {
-                                // Trigger load more
-                                Future.delayed(Duration.zero, () {
-                                  if (_hasMore && !_isLoading) {
-                                    _loadOrganizations();
-                                  }
-                                });
-                                return const SizedBox.shrink();
+                            );
+                          } else {
+                            // Trigger load more
+                            Future.delayed(Duration.zero, () {
+                              if (_hasMore && !_isLoading) {
+                                _loadOrganizations();
                               }
-                            }
+                            });
+                            return const SizedBox.shrink();
+                          }
+                        }
 
-                            final organization = _organizations[index];
+                        final organization = _organizations[index];
 
-                            return buildOrganizationHonorCard(organization);
-                          },
-                        ),
-                      ),
+                        return buildOrganizationHonorCard(organization);
+                      },
+                    ),
+                  ),
           ),
         ],
       ),
@@ -311,10 +307,18 @@ class _OrganizationHonorState extends State<OrganizationHonor> {
         _loadOrganizations(refresh: true);
       },
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         decoration: BoxDecoration(
-          color: isSelected ? primaryColor : Colors.grey[200],
-          borderRadius: BorderRadius.circular(20),
+          color: isSelected ? primaryColor : Colors.white,
+          borderRadius: BorderRadius.circular(24),
+          boxShadow: [
+            if (!isSelected)
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.04),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+          ],
         ),
         child: Text(
           label,

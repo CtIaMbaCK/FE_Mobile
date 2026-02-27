@@ -13,12 +13,12 @@ Widget buildOrganizationCard(
   return Container(
     decoration: BoxDecoration(
       color: Colors.white,
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: BorderRadius.circular(24),
       boxShadow: [
         BoxShadow(
-          blurRadius: 4,
-          color: Colors.black.withOpacity(0.1),
-          offset: const Offset(0, 0),
+          color: const Color(0xFF008080).withValues(alpha: 0.04),
+          blurRadius: 10,
+          offset: const Offset(0, 4),
         ),
       ],
     ),
@@ -37,12 +37,12 @@ Widget buildOrganizationCard(
         Text(
           name,
           textAlign: TextAlign.center,
-          style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.bold),
+          style: GoogleFonts.roboto(fontSize: 12, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 4),
         Text(
           campaigns,
-          style: GoogleFonts.inter(
+          style: GoogleFonts.roboto(
             fontSize: 11,
             color: primaryColor,
             fontWeight: FontWeight.w500,
@@ -62,12 +62,12 @@ Widget buildBlogItem({
   return Container(
     decoration: BoxDecoration(
       color: Colors.white,
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: BorderRadius.circular(24),
       boxShadow: [
         BoxShadow(
-          blurRadius: 4,
-          color: Colors.black.withOpacity(0.1),
-          offset: const Offset(0, 1),
+          color: const Color(0xFF008080).withValues(alpha: 0.04),
+          blurRadius: 10,
+          offset: const Offset(0, 4),
         ),
       ],
     ),
@@ -75,7 +75,7 @@ Widget buildBlogItem({
     child: Row(
       children: [
         ClipRRect(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(12),
           child: CachedNetworkImage(
             imageUrl: imageUrl,
             width: 80,
@@ -91,7 +91,7 @@ Widget buildBlogItem({
               Text(
                 title,
                 maxLines: 2,
-                style: GoogleFonts.interTight(
+                style: GoogleFonts.roboto(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
                 ),
@@ -100,7 +100,7 @@ Widget buildBlogItem({
               Text(
                 desc,
                 maxLines: 2,
-                style: GoogleFonts.inter(
+                style: GoogleFonts.roboto(
                   fontSize: 12,
                   color: const Color(0xFF666666),
                 ),
@@ -108,7 +108,7 @@ Widget buildBlogItem({
               const SizedBox(height: 4),
               Text(
                 time,
-                style: GoogleFonts.inter(
+                style: GoogleFonts.roboto(
                   fontSize: 11,
                   color: primaryColor,
                   fontWeight: FontWeight.w500,

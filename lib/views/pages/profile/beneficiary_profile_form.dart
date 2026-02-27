@@ -123,7 +123,7 @@ class _BeneficiaryProfileEditFormState
               border: Border.all(color: const Color(0xFF008080), width: 3),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.grey.withOpacity(0.15),
+                  color: Colors.grey.withValues(alpha: 0.15),
                   blurRadius: 12,
                   offset: const Offset(0, 4),
                 ),
@@ -138,36 +138,36 @@ class _BeneficiaryProfileEditFormState
                       height: 120,
                     )
                   : (_oldAvatarUrl != null && _oldAvatarUrl!.isNotEmpty)
-                      ? CachedNetworkImage(
-                          imageUrl: _oldAvatarUrl!,
-                          fit: BoxFit.cover,
-                          width: 120,
-                          height: 120,
-                          placeholder: (context, url) => Container(
-                            color: const Color(0xFFF8FCFC),
-                            child: const Center(
-                              child: CircularProgressIndicator(
-                                color: Color(0xFF008080),
-                              ),
-                            ),
-                          ),
-                          errorWidget: (context, url, error) => Container(
-                            color: const Color(0xFFF8FCFC),
-                            child: const Icon(
-                              Icons.person,
-                              size: 60,
-                              color: Color(0xFF008080),
-                            ),
-                          ),
-                        )
-                      : Container(
-                          color: const Color(0xFFF8FCFC),
-                          child: const Icon(
-                            Icons.person,
-                            size: 60,
+                  ? CachedNetworkImage(
+                      imageUrl: _oldAvatarUrl!,
+                      fit: BoxFit.cover,
+                      width: 120,
+                      height: 120,
+                      placeholder: (context, url) => Container(
+                        color: const Color(0xFFF8FCFC),
+                        child: const Center(
+                          child: CircularProgressIndicator(
                             color: Color(0xFF008080),
                           ),
                         ),
+                      ),
+                      errorWidget: (context, url, error) => Container(
+                        color: const Color(0xFFF8FCFC),
+                        child: const Icon(
+                          Icons.person,
+                          size: 60,
+                          color: Color(0xFF008080),
+                        ),
+                      ),
+                    )
+                  : Container(
+                      color: const Color(0xFFF8FCFC),
+                      child: const Icon(
+                        Icons.person,
+                        size: 60,
+                        color: Color(0xFF008080),
+                      ),
+                    ),
             ),
           ),
           Positioned(
@@ -184,7 +184,7 @@ class _BeneficiaryProfileEditFormState
                   border: Border.all(color: Colors.white, width: 3),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
+                      color: Colors.black.withValues(alpha: 0.1),
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                     ),
@@ -208,10 +208,10 @@ class _BeneficiaryProfileEditFormState
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: const Color(0xFF008080).withValues(alpha: 0.04),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -240,11 +240,7 @@ class _BeneficiaryProfileEditFormState
                     color: Colors.blue[50],
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Icon(
-                    Icons.history,
-                    color: Colors.blue[700],
-                    size: 28,
-                  ),
+                  child: Icon(Icons.history, color: Colors.blue[700], size: 28),
                 ),
                 const SizedBox(width: 16),
                 // Text
@@ -272,11 +268,7 @@ class _BeneficiaryProfileEditFormState
                   ),
                 ),
                 // Arrow icon
-                Icon(
-                  Icons.chevron_right,
-                  color: Colors.grey[400],
-                  size: 28,
-                ),
+                Icon(Icons.chevron_right, color: Colors.grey[400], size: 28),
               ],
             ),
           ),
@@ -291,11 +283,11 @@ class _BeneficiaryProfileEditFormState
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.08),
-            blurRadius: 16,
+            color: const Color(0xFF008080).withValues(alpha: 0.04),
+            blurRadius: 10,
             offset: const Offset(0, 4),
           ),
         ],
@@ -353,28 +345,31 @@ class _BeneficiaryProfileEditFormState
         ),
         const SizedBox(height: 8),
         DropdownButtonFormField<String>(
-          value: _vulnerabilityType,
-          items: [
-            'POOR',
-            'DISABLED',
-            'ELDERLY',
-            'ORPHAN',
-            'CHRONIC_DISEASE',
-            'OTHER',
-          ].map((type) {
-            return DropdownMenuItem(
-              value: type,
-              child: Text(_getVietnameseName(type)),
-            );
-          }).toList(),
+          initialValue: _vulnerabilityType,
+          items:
+              [
+                'POOR',
+                'DISABLED',
+                'ELDERLY',
+                'ORPHAN',
+                'CHRONIC_DISEASE',
+                'OTHER',
+              ].map((type) {
+                return DropdownMenuItem(
+                  value: type,
+                  child: Text(_getVietnameseName(type)),
+                );
+              }).toList(),
           onChanged: (value) {
             if (value != null) {
               setState(() => _vulnerabilityType = value);
             }
           },
           decoration: InputDecoration(
-            prefixIcon:
-                const Icon(Icons.category_outlined, color: Color(0xFF008080)),
+            prefixIcon: const Icon(
+              Icons.category_outlined,
+              color: Color(0xFF008080),
+            ),
             filled: true,
             fillColor: const Color(0xFFF8FCFC),
             contentPadding: const EdgeInsets.symmetric(
@@ -424,11 +419,11 @@ class _BeneficiaryProfileEditFormState
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.08),
-            blurRadius: 16,
+            color: const Color(0xFF008080).withValues(alpha: 0.04),
+            blurRadius: 10,
             offset: const Offset(0, 4),
           ),
         ],
@@ -484,11 +479,11 @@ class _BeneficiaryProfileEditFormState
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.08),
-            blurRadius: 16,
+            color: const Color(0xFF008080).withValues(alpha: 0.04),
+            blurRadius: 10,
             offset: const Offset(0, 4),
           ),
         ],
@@ -547,11 +542,11 @@ class _BeneficiaryProfileEditFormState
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.08),
-            blurRadius: 16,
+            color: const Color(0xFF008080).withValues(alpha: 0.04),
+            blurRadius: 10,
             offset: const Offset(0, 4),
           ),
         ],
@@ -653,16 +648,12 @@ class _BeneficiaryProfileEditFormState
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.2),
+                    color: Colors.black.withValues(alpha: 0.2),
                     blurRadius: 4,
                   ),
                 ],
               ),
-              child: const Icon(
-                Icons.close,
-                color: Colors.white,
-                size: 16,
-              ),
+              child: const Icon(Icons.close, color: Colors.white, size: 16),
             ),
           ),
         ),
@@ -705,16 +696,12 @@ class _BeneficiaryProfileEditFormState
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.2),
+                    color: Colors.black.withValues(alpha: 0.2),
                     blurRadius: 4,
                   ),
                 ],
               ),
-              child: const Icon(
-                Icons.close,
-                color: Colors.white,
-                size: 16,
-              ),
+              child: const Icon(Icons.close, color: Colors.white, size: 16),
             ),
           ),
         ),
@@ -840,7 +827,7 @@ class _BeneficiaryProfileEditFormState
               color: Colors.white,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.grey.withOpacity(0.1),
+                  color: Colors.grey.withValues(alpha: 0.1),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
@@ -851,51 +838,51 @@ class _BeneficiaryProfileEditFormState
               child: newFile != null
                   ? Image.file(newFile, fit: BoxFit.cover)
                   : (oldUrl != null && oldUrl.isNotEmpty)
-                      ? CachedNetworkImage(
-                          imageUrl: oldUrl,
-                          fit: BoxFit.cover,
-                          placeholder: (context, url) => const Center(
-                            child: CircularProgressIndicator(
-                              color: Color(0xFF008080),
-                            ),
-                          ),
-                          errorWidget: (context, url, error) => Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Icon(
-                                Icons.broken_image_outlined,
-                                size: 48,
-                                color: Colors.grey,
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                'Lỗi tải ảnh',
-                                style: GoogleFonts.roboto(
-                                  color: Colors.grey,
-                                  fontSize: 12,
-                                ),
-                              ),
-                            ],
-                          ),
-                        )
-                      : Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Icon(
-                              Icons.add_photo_alternate,
-                              size: 48,
-                              color: Color(0xFF008080),
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              'Thêm ảnh',
-                              style: GoogleFonts.roboto(
-                                color: Colors.grey,
-                                fontSize: 12,
-                              ),
-                            ),
-                          ],
+                  ? CachedNetworkImage(
+                      imageUrl: oldUrl,
+                      fit: BoxFit.cover,
+                      placeholder: (context, url) => const Center(
+                        child: CircularProgressIndicator(
+                          color: Color(0xFF008080),
                         ),
+                      ),
+                      errorWidget: (context, url, error) => Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(
+                            Icons.broken_image_outlined,
+                            size: 48,
+                            color: Colors.grey,
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Lỗi tải ảnh',
+                            style: GoogleFonts.roboto(
+                              color: Colors.grey,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  : Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(
+                          Icons.add_photo_alternate,
+                          size: 48,
+                          color: Color(0xFF008080),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Thêm ảnh',
+                          style: GoogleFonts.roboto(
+                            color: Colors.grey,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
+                    ),
             ),
           ),
         ),
@@ -958,11 +945,7 @@ class _BeneficiaryProfileEditFormState
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(
-              Icons.logout,
-              color: Color(0xFFD32F2F),
-              size: 20,
-            ),
+            const Icon(Icons.logout, color: Color(0xFFD32F2F), size: 20),
             const SizedBox(width: 8),
             Text(
               'Đăng xuất',
@@ -1139,8 +1122,9 @@ class _BeneficiaryProfileEditFormState
         cccdFront: _newFront,
         cccdBack: _newBack,
         proofFiles: _newProofFiles.isNotEmpty ? _newProofFiles : null,
-        keepingProofFiles:
-            _keepingProofUrls.isNotEmpty ? _keepingProofUrls : null,
+        keepingProofFiles: _keepingProofUrls.isNotEmpty
+            ? _keepingProofUrls
+            : null,
       );
 
       if (mounted) {
@@ -1161,11 +1145,13 @@ class _BeneficiaryProfileEditFormState
               _nameController.text = profile['fullName'] ?? "";
 
               _vulnerabilityType = profile['vulnerabilityType'] ?? "POOR";
-              _healthConditionController.text = profile['healthCondition'] ?? "";
+              _healthConditionController.text =
+                  profile['healthCondition'] ?? "";
               _situationController.text = profile['situationDescription'] ?? "";
               _guardianNameController.text = profile['guardianName'] ?? "";
               _guardianPhoneController.text = profile['guardianPhone'] ?? "";
-              _guardianRelationController.text = profile['guardianRelation'] ?? "";
+              _guardianRelationController.text =
+                  profile['guardianRelation'] ?? "";
 
               // QUAN TRỌNG: Reset Files về null và load URLs mới
               _newAvatar = null;
@@ -1212,10 +1198,7 @@ class _BeneficiaryProfileEditFormState
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Lỗi: $e'),
-            backgroundColor: Colors.red,
-          ),
+          SnackBar(content: Text('Lỗi: $e'), backgroundColor: Colors.red),
         );
       }
     } finally {
@@ -1230,9 +1213,7 @@ class _BeneficiaryProfileEditFormState
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Text(
           'Xác nhận đăng xuất',
           style: GoogleFonts.roboto(
@@ -1281,9 +1262,7 @@ class _BeneficiaryProfileEditFormState
         selectedPageNotifier.value = 0;
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(
-            builder: (context) => const LoginPage(),
-          ),
+          MaterialPageRoute(builder: (context) => const LoginPage()),
         );
       }
     }
@@ -1380,40 +1359,40 @@ class _BeneficiaryProfileEditFormState
           ),
           padding: const EdgeInsets.all(20),
           child: Column(
-          children: [
-            // Section 1: Avatar
-            _buildAvatarSection(),
-            const SizedBox(height: 24),
+            children: [
+              // Section 1: Avatar
+              _buildAvatarSection(),
+              const SizedBox(height: 24),
 
-            // Navigation: Lịch sử hoạt động
-            _buildActivityHistoryCard(),
-            const SizedBox(height: 32),
+              // Navigation: Lịch sử hoạt động
+              _buildActivityHistoryCard(),
+              const SizedBox(height: 32),
 
-            // Section 2: Thông tin cơ bản
-            _buildBasicInfoSection(),
-            const SizedBox(height: 20),
+              // Section 2: Thông tin cơ bản
+              _buildBasicInfoSection(),
+              const SizedBox(height: 20),
 
-            // Section 3: Thông tin người giám hộ
-            _buildGuardianSection(),
-            const SizedBox(height: 20),
+              // Section 3: Thông tin người giám hộ
+              _buildGuardianSection(),
+              const SizedBox(height: 20),
 
-            // Section 4: CCCD
-            _buildCCCDSection(),
-            const SizedBox(height: 20),
+              // Section 4: CCCD
+              _buildCCCDSection(),
+              const SizedBox(height: 20),
 
-            // Section 5: ProofFiles
-            _buildProofFilesSection(),
-            const SizedBox(height: 32),
+              // Section 5: ProofFiles
+              _buildProofFilesSection(),
+              const SizedBox(height: 32),
 
-            // Nút Lưu
-            _buildSaveButton(),
-            const SizedBox(height: 16),
+              // Nút Lưu
+              _buildSaveButton(),
+              const SizedBox(height: 16),
 
-            // Nút Đăng xuất
-            _buildLogoutButton(),
-            const SizedBox(height: 20),
-          ],
-        ),
+              // Nút Đăng xuất
+              _buildLogoutButton(),
+              const SizedBox(height: 20),
+            ],
+          ),
         ),
       ),
     );

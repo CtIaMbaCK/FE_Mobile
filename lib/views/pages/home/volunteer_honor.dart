@@ -92,7 +92,9 @@ class _VolunteerHonorState extends State<VolunteerHonor> {
 
           // Tìm rank của mình
           if (_currentUserId != null) {
-            final myIndex = _volunteers.indexWhere((v) => v.id == _currentUserId);
+            final myIndex = _volunteers.indexWhere(
+              (v) => v.id == _currentUserId,
+            );
             if (myIndex != -1) {
               _myRank = myIndex + 1;
             }
@@ -104,9 +106,9 @@ class _VolunteerHonorState extends State<VolunteerHonor> {
     } catch (e) {
       setState(() => _isLoading = false);
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Lỗi tải dữ liệu: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Lỗi tải dữ liệu: $e')));
       }
     }
   }
@@ -139,10 +141,7 @@ class _VolunteerHonorState extends State<VolunteerHonor> {
         ),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(1),
-          child: Container(
-            color: Colors.grey[200],
-            height: 1,
-          ),
+          child: Container(color: Colors.grey[200], height: 1),
         ),
       ),
       body: Column(
@@ -168,9 +167,9 @@ class _VolunteerHonorState extends State<VolunteerHonor> {
                       )
                     : null,
                 filled: true,
-                fillColor: const Color(0xFFF0F0F0),
+                fillColor: Colors.white,
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(20),
                   borderSide: BorderSide.none,
                 ),
                 contentPadding: const EdgeInsets.symmetric(
@@ -192,12 +191,12 @@ class _VolunteerHonorState extends State<VolunteerHonor> {
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(24),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFF008080).withValues(alpha: 0.3),
-                    blurRadius: 8,
-                    offset: const Offset(0, 4),
+                    color: const Color(0xFF008080).withValues(alpha: 0.2),
+                    blurRadius: 20,
+                    offset: const Offset(0, 10),
                   ),
                 ],
               ),
@@ -259,83 +258,76 @@ class _VolunteerHonorState extends State<VolunteerHonor> {
           // Volunteers list
           Expanded(
             child: _isLoading && _volunteers.isEmpty
+                ? Center(child: CircularProgressIndicator(color: primaryColor))
+                : _volunteers.isEmpty
                 ? Center(
-                    child: CircularProgressIndicator(
-                      color: primaryColor,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.people_outline,
+                          size: 64,
+                          color: Colors.grey[400],
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'Chưa có tình nguyện viên',
+                          style: GoogleFonts.roboto(
+                            fontSize: 16,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                      ],
                     ),
                   )
-                : _volunteers.isEmpty
-                    ? Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.people_outline,
-                              size: 64,
-                              color: Colors.grey[400],
-                            ),
-                            const SizedBox(height: 16),
-                            Text(
-                              'Chưa có tình nguyện viên',
-                              style: GoogleFonts.roboto(
-                                fontSize: 16,
-                                color: Colors.grey[600],
-                              ),
-                            ),
-                          ],
-                        ),
-                      )
-                    : RefreshIndicator(
-                        onRefresh: () => _loadVolunteers(refresh: true),
-                        color: primaryColor,
-                        child: ListView.builder(
-                          padding: const EdgeInsets.all(16),
-                          itemCount: _volunteers.length + (_hasMore ? 1 : 0),
-                          itemBuilder: (context, index) {
-                            if (index == _volunteers.length) {
-                              // Load more indicator
-                              if (_isLoading) {
-                                return Center(
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(16),
-                                    child: CircularProgressIndicator(
-                                      color: primaryColor,
-                                    ),
-                                  ),
-                                );
-                              } else {
-                                // Trigger load more
-                                Future.delayed(Duration.zero, () {
-                                  if (_hasMore && !_isLoading) {
-                                    _loadVolunteers();
-                                  }
-                                });
-                                return const SizedBox.shrink();
-                              }
-                            }
-
-                            final volunteer = _volunteers[index];
-                            final isCurrentUser = volunteer.id == _currentUserId;
-                            final rank = index + 1;
-
-                            return Container(
-                              decoration: isCurrentUser
-                                  ? BoxDecoration(
-                                      border: Border.all(
-                                        color: primaryColor,
-                                        width: 2,
-                                      ),
-                                      borderRadius: BorderRadius.circular(12),
-                                    )
-                                  : null,
-                              child: buildVolunteerHonorCard(
-                                volunteer,
-                                rank: rank,
+                : RefreshIndicator(
+                    onRefresh: () => _loadVolunteers(refresh: true),
+                    color: primaryColor,
+                    child: ListView.builder(
+                      padding: const EdgeInsets.all(16),
+                      itemCount: _volunteers.length + (_hasMore ? 1 : 0),
+                      itemBuilder: (context, index) {
+                        if (index == _volunteers.length) {
+                          // Load more indicator
+                          if (_isLoading) {
+                            return Center(
+                              child: Padding(
+                                padding: const EdgeInsets.all(16),
+                                child: CircularProgressIndicator(
+                                  color: primaryColor,
+                                ),
                               ),
                             );
-                          },
-                        ),
-                      ),
+                          } else {
+                            // Trigger load more
+                            Future.delayed(Duration.zero, () {
+                              if (_hasMore && !_isLoading) {
+                                _loadVolunteers();
+                              }
+                            });
+                            return const SizedBox.shrink();
+                          }
+                        }
+
+                        final volunteer = _volunteers[index];
+                        final isCurrentUser = volunteer.id == _currentUserId;
+                        final rank = index + 1;
+
+                        return Container(
+                          decoration: isCurrentUser
+                              ? BoxDecoration(
+                                  border: Border.all(
+                                    color: primaryColor,
+                                    width: 2,
+                                  ),
+                                  borderRadius: BorderRadius.circular(12),
+                                )
+                              : null,
+                          child: buildVolunteerHonorCard(volunteer, rank: rank),
+                        );
+                      },
+                    ),
+                  ),
           ),
         ],
       ),

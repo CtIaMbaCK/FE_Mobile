@@ -15,13 +15,12 @@ Widget buildVolunteerHonorCard(VolunteerHonorModel volunteer, {int? rank}) {
     padding: const EdgeInsets.all(16),
     decoration: BoxDecoration(
       color: Colors.white,
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: BorderRadius.circular(16),
       boxShadow: [
         BoxShadow(
-          color: Colors.grey.withValues(alpha: 0.1),
-          spreadRadius: 1,
-          blurRadius: 4,
-          offset: const Offset(0, 2),
+          color: const Color(0xFF008080).withValues(alpha: 0.04),
+          blurRadius: 10,
+          offset: const Offset(0, 4),
         ),
       ],
     ),
@@ -56,10 +55,7 @@ Widget buildVolunteerHonorCard(VolunteerHonorModel volunteer, {int? rank}) {
           height: 56,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            border: Border.all(
-              color: const Color(0xFF008080),
-              width: 2,
-            ),
+            border: Border.all(color: const Color(0xFF008080), width: 2),
           ),
           child: ClipOval(
             child: avatarUrl.isNotEmpty
@@ -109,11 +105,7 @@ Widget buildVolunteerHonorCard(VolunteerHonorModel volunteer, {int? rank}) {
               const SizedBox(height: 4),
               Row(
                 children: [
-                  const Icon(
-                    Icons.star,
-                    size: 16,
-                    color: Color(0xFFFFB800),
-                  ),
+                  const Icon(Icons.star, size: 16, color: Color(0xFFFFB800)),
                   const SizedBox(width: 4),
                   Text(
                     '$points điểm',

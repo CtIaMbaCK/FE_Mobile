@@ -16,13 +16,12 @@ Widget buildOrganizationHonorCard(OrganizationModel organization) {
     padding: const EdgeInsets.all(16),
     decoration: BoxDecoration(
       color: Colors.white,
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: BorderRadius.circular(16),
       boxShadow: [
         BoxShadow(
-          color: Colors.grey.withValues(alpha: 0.1),
-          spreadRadius: 1,
-          blurRadius: 4,
-          offset: const Offset(0, 2),
+          color: const Color(0xFF008080).withValues(alpha: 0.04),
+          blurRadius: 10,
+          offset: const Offset(0, 4),
         ),
       ],
     ),
@@ -34,10 +33,7 @@ Widget buildOrganizationHonorCard(OrganizationModel organization) {
           height: 56,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            border: Border.all(
-              color: const Color(0xFF008080),
-              width: 2,
-            ),
+            border: Border.all(color: const Color(0xFF008080), width: 2),
           ),
           child: ClipOval(
             child: avatarUrl.isNotEmpty
@@ -101,11 +97,7 @@ Widget buildOrganizationHonorCard(OrganizationModel organization) {
                     ),
                   ),
                   const SizedBox(width: 12),
-                  const Icon(
-                    Icons.people,
-                    size: 14,
-                    color: Color(0xFF008080),
-                  ),
+                  const Icon(Icons.people, size: 14, color: Color(0xFF008080)),
                   const SizedBox(width: 4),
                   Text(
                     '$totalVolunteers TNV',
@@ -121,11 +113,7 @@ Widget buildOrganizationHonorCard(OrganizationModel organization) {
         ),
 
         // Arrow icon
-        const Icon(
-          Icons.chevron_right,
-          color: Colors.grey,
-          size: 24,
-        ),
+        const Icon(Icons.chevron_right, color: Colors.grey, size: 24),
       ],
     ),
   );
