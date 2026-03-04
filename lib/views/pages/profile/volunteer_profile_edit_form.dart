@@ -74,6 +74,66 @@ class _VolunteerProfileEditFormState extends State<VolunteerProfileEditForm> {
     _remoteBackUrl = profile['cccdBackFile'];
   }
 
+  Future<void> _refreshProfile() async {
+    setState(() => _isLoading = true);
+    try {
+      final updatedData = await _authService.getMyProfile();
+      if (updatedData != null && mounted) {
+        final profile = updatedData['volunteerProfile'] ?? {};
+        setState(() {
+          _nameController.text = profile['fullName'] ?? "";
+          _bioController.text = profile['bio'] ?? "";
+          _expController.text = profile['experienceYears']?.toString() ?? "0";
+
+          if (profile['skills'] != null) {
+            _selectedSkills = List<String>.from(profile['skills']);
+          } else {
+            _selectedSkills = [];
+          }
+
+          if (profile['preferredDistricts'] != null) {
+            _selectedDistricts = List<String>.from(
+              profile['preferredDistricts'],
+            );
+          } else {
+            _selectedDistricts = [];
+          }
+
+          _avatar = null;
+          _front = null;
+          _back = null;
+
+          _remoteAvatarUrl = profile['avatarUrl'];
+          _remoteFrontUrl = profile['cccdFrontFile'];
+          _remoteBackUrl = profile['cccdBackFile'];
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Đã cập nhật dữ liệu mới nhất'),
+            backgroundColor: Color(0xFF008080),
+            duration: Duration(seconds: 2),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Lỗi tải dữ liệu mới: $e'),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
   @override
   void dispose() {
     _nameController.dispose();
@@ -112,36 +172,36 @@ class _VolunteerProfileEditFormState extends State<VolunteerProfileEditForm> {
                       height: 120,
                     )
                   : (_remoteAvatarUrl != null && _remoteAvatarUrl!.isNotEmpty)
-                      ? CachedNetworkImage(
-                          imageUrl: _remoteAvatarUrl!,
-                          fit: BoxFit.cover,
-                          width: 120,
-                          height: 120,
-                          placeholder: (context, url) => Container(
-                            color: const Color(0xFFF8FCFC),
-                            child: const Center(
-                              child: CircularProgressIndicator(
-                                color: Color(0xFF008080),
-                              ),
-                            ),
-                          ),
-                          errorWidget: (context, url, error) => Container(
-                            color: const Color(0xFFF8FCFC),
-                            child: const Icon(
-                              Icons.person,
-                              size: 60,
-                              color: Color(0xFF008080),
-                            ),
-                          ),
-                        )
-                      : Container(
-                          color: const Color(0xFFF8FCFC),
-                          child: const Icon(
-                            Icons.person,
-                            size: 60,
+                  ? CachedNetworkImage(
+                      imageUrl: _remoteAvatarUrl!,
+                      fit: BoxFit.cover,
+                      width: 120,
+                      height: 120,
+                      placeholder: (context, url) => Container(
+                        color: const Color(0xFFF8FCFC),
+                        child: const Center(
+                          child: CircularProgressIndicator(
                             color: Color(0xFF008080),
                           ),
                         ),
+                      ),
+                      errorWidget: (context, url, error) => Container(
+                        color: const Color(0xFFF8FCFC),
+                        child: const Icon(
+                          Icons.person,
+                          size: 60,
+                          color: Color(0xFF008080),
+                        ),
+                      ),
+                    )
+                  : Container(
+                      color: const Color(0xFFF8FCFC),
+                      child: const Icon(
+                        Icons.person,
+                        size: 60,
+                        color: Color(0xFF008080),
+                      ),
+                    ),
             ),
           ),
           Positioned(
@@ -330,56 +390,53 @@ class _VolunteerProfileEditFormState extends State<VolunteerProfileEditForm> {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(14),
               child: newFile != null
-                  ? Image.file(
-                      newFile,
-                      fit: BoxFit.cover,
-                    )
+                  ? Image.file(newFile, fit: BoxFit.cover)
                   : (oldUrl != null && oldUrl.isNotEmpty)
-                      ? CachedNetworkImage(
-                          imageUrl: oldUrl,
-                          fit: BoxFit.cover,
-                          placeholder: (context, url) => const Center(
-                            child: CircularProgressIndicator(
-                              color: Color(0xFF008080),
-                            ),
-                          ),
-                          errorWidget: (context, url, error) => Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Icon(
-                                Icons.broken_image_outlined,
-                                size: 48,
-                                color: Colors.grey,
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                'Lỗi tải ảnh',
-                                style: GoogleFonts.roboto(
-                                  color: Colors.grey,
-                                  fontSize: 12,
-                                ),
-                              ),
-                            ],
-                          ),
-                        )
-                      : Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Icon(
-                              Icons.add_photo_alternate,
-                              size: 48,
-                              color: Color(0xFF008080),
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              'Thêm ảnh',
-                              style: GoogleFonts.roboto(
-                                color: Colors.grey,
-                                fontSize: 12,
-                              ),
-                            ),
-                          ],
+                  ? CachedNetworkImage(
+                      imageUrl: oldUrl,
+                      fit: BoxFit.cover,
+                      placeholder: (context, url) => const Center(
+                        child: CircularProgressIndicator(
+                          color: Color(0xFF008080),
                         ),
+                      ),
+                      errorWidget: (context, url, error) => Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(
+                            Icons.broken_image_outlined,
+                            size: 48,
+                            color: Colors.grey,
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Lỗi tải ảnh',
+                            style: GoogleFonts.roboto(
+                              color: Colors.grey,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  : Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(
+                          Icons.add_photo_alternate,
+                          size: 48,
+                          color: Color(0xFF008080),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Thêm ảnh',
+                          style: GoogleFonts.roboto(
+                            color: Colors.grey,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
+                    ),
             ),
           ),
         ),
@@ -458,7 +515,11 @@ class _VolunteerProfileEditFormState extends State<VolunteerProfileEditForm> {
         children: [
           Row(
             children: [
-              const Icon(Icons.emoji_objects, color: Color(0xFF008080), size: 24),
+              const Icon(
+                Icons.emoji_objects,
+                color: Color(0xFF008080),
+                size: 24,
+              ),
               const SizedBox(width: 8),
               Text(
                 'Kỹ năng tình nguyện',
@@ -496,7 +557,9 @@ class _VolunteerProfileEditFormState extends State<VolunteerProfileEditForm> {
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                 ),
                 side: BorderSide(
-                  color: isSelected ? const Color(0xFF008080) : Colors.grey.shade300,
+                  color: isSelected
+                      ? const Color(0xFF008080)
+                      : Colors.grey.shade300,
                   width: isSelected ? 1.5 : 1,
                 ),
                 onSelected: (selected) {
@@ -574,7 +637,9 @@ class _VolunteerProfileEditFormState extends State<VolunteerProfileEditForm> {
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                 ),
                 side: BorderSide(
-                  color: isSelected ? const Color(0xFF008080) : Colors.grey.shade300,
+                  color: isSelected
+                      ? const Color(0xFF008080)
+                      : Colors.grey.shade300,
                   width: isSelected ? 1.5 : 1,
                 ),
                 onSelected: (selected) {
@@ -692,7 +757,9 @@ class _VolunteerProfileEditFormState extends State<VolunteerProfileEditForm> {
         bio: _bioController.text.trim(),
         experienceYears: int.tryParse(_expController.text.trim()) ?? 0,
         skills: _selectedSkills.isEmpty ? null : _selectedSkills,
-        preferredDistricts: _selectedDistricts.isEmpty ? null : _selectedDistricts,
+        preferredDistricts: _selectedDistricts.isEmpty
+            ? null
+            : _selectedDistricts,
         avatar: _avatar,
         cccdFront: _front,
         cccdBack: _back,
@@ -711,7 +778,8 @@ class _VolunteerProfileEditFormState extends State<VolunteerProfileEditForm> {
             setState(() {
               _nameController.text = profile['fullName'] ?? "";
               _bioController.text = profile['bio'] ?? "";
-              _expController.text = profile['experienceYears']?.toString() ?? "0";
+              _expController.text =
+                  profile['experienceYears']?.toString() ?? "0";
 
               // Load skills và districts mới
               if (profile['skills'] != null) {
@@ -721,7 +789,9 @@ class _VolunteerProfileEditFormState extends State<VolunteerProfileEditForm> {
               }
 
               if (profile['preferredDistricts'] != null) {
-                _selectedDistricts = List<String>.from(profile['preferredDistricts']);
+                _selectedDistricts = List<String>.from(
+                  profile['preferredDistricts'],
+                );
               } else {
                 _selectedDistricts = [];
               }
@@ -787,10 +857,7 @@ class _VolunteerProfileEditFormState extends State<VolunteerProfileEditForm> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Lỗi: $e'),
-            backgroundColor: Colors.red,
-          ),
+          SnackBar(content: Text('Lỗi: $e'), backgroundColor: Colors.red),
         );
       }
     } finally {
@@ -820,35 +887,41 @@ class _VolunteerProfileEditFormState extends State<VolunteerProfileEditForm> {
         elevation: 0,
         iconTheme: const IconThemeData(color: Color(0xFF008080)),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          children: [
-            // Section 1: Avatar
-            _buildAvatarSection(),
-            const SizedBox(height: 32),
+      body: RefreshIndicator(
+        onRefresh: _refreshProfile,
+        color: const Color(0xFF008080),
+        backgroundColor: Colors.white,
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            children: [
+              // Section 1: Avatar
+              _buildAvatarSection(),
+              const SizedBox(height: 32),
 
-            // Section 2: Thông tin cơ bản
-            _buildBasicInfoSection(),
-            const SizedBox(height: 32),
+              // Section 2: Thông tin cơ bản
+              _buildBasicInfoSection(),
+              const SizedBox(height: 32),
 
-            // Section 3: Kỹ năng
-            _buildSkillsSection(),
-            const SizedBox(height: 32),
+              // Section 3: Kỹ năng
+              _buildSkillsSection(),
+              const SizedBox(height: 32),
 
-            // Section 4: Quận/Huyện ưu tiên
-            _buildDistrictsSection(),
-            const SizedBox(height: 32),
+              // Section 4: Quận/Huyện ưu tiên
+              _buildDistrictsSection(),
+              const SizedBox(height: 32),
 
-            // Section 5: CCCD
-            _buildCCCDSection(),
-            const SizedBox(height: 32),
+              // Section 5: CCCD
+              _buildCCCDSection(),
+              const SizedBox(height: 32),
 
-            // Save button
-            _buildSaveButton(),
+              // Save button
+              _buildSaveButton(),
 
-            const SizedBox(height: 20),
-          ],
+              const SizedBox(height: 20),
+            ],
+          ),
         ),
       ),
     );

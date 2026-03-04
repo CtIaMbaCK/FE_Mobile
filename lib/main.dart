@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:mobile/data/notifiers.dart';
 import 'package:mobile/views/widget_tree.dart'; // Import file WidgetTree vừa sửa
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await initializeDateFormatting('vi_VN', null);
   // ... các logic init khác của bạn ...
 
   runApp(const MyApp());

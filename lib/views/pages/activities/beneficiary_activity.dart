@@ -49,10 +49,25 @@ class _BeneficiaryActivityPageState extends State<BeneficiaryActivityPage> {
         false;
 
     if (confirm) {
-      // Giả sử API delete bài đăng là deleteRequest
-      // bool success = await _requestService.deleteRequest(id);
-      // if (success) setState(() {});
-      print("Đã thực hiện lệnh hủy cho ID: $id");
+      bool success = await _requestService.cancelRequest(id);
+      if (mounted) {
+        if (success) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Hủy yêu cầu thành công'),
+              backgroundColor: Colors.green,
+            ),
+          );
+          setState(() {}); // Refresh list
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Lỗi khi hủy yêu cầu'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
     }
   }
 
@@ -588,7 +603,7 @@ class _BeneficiaryActivityPageState extends State<BeneficiaryActivityPage> {
                       final hasAppreciated = snapshot.data ?? false;
 
                       if (hasAppreciated) {
-                        return const SizedBox.shrink(); // Ẩn nút nếu đã gửi
+                        return const SizedBox.shrink(); // Ẩn hoàn toàn nếu đã cảm ơn
                       }
 
                       return SizedBox(

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:mobile/services/emergency_service.dart';
 import 'package:mobile/services/chat/chat_socket_service.dart';
 
 class SosEmergencyPage extends StatefulWidget {
@@ -11,7 +10,6 @@ class SosEmergencyPage extends StatefulWidget {
 
 class _SosEmergencyPageState extends State<SosEmergencyPage>
     with SingleTickerProviderStateMixin {
-  final EmergencyService _emergencyService = EmergencyService();
   final ChatSocketService _socketService = ChatSocketService();
 
   bool _isLoading = false;
@@ -118,8 +116,8 @@ class _SosEmergencyPageState extends State<SosEmergencyPage>
       // Gửi SOS qua Socket.IO (now async)
       await _socketService.sendSOS();
 
-      // Backup: Gửi qua REST API (nếu socket fail)
-      await _emergencyService.createEmergency();
+      // Backup: Gửi qua REST API (nếu socket fail) đã comment để tránh lỗi 2 lần
+      // await _emergencyService.createEmergency();
 
       if (!mounted) return;
 

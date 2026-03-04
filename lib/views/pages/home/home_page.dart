@@ -5,7 +5,7 @@ import 'package:mobile/services/auth_service.dart';
 import 'package:mobile/services/volunteer_service.dart';
 import 'package:mobile/services/organization_service.dart';
 import 'package:mobile/services/blog_service.dart';
-import 'package:mobile/services/emergency_service.dart';
+import 'package:mobile/services/chat/chat_socket_service.dart';
 import 'package:mobile/services/campaign_service.dart';
 import 'package:mobile/models/volunteer_honor_model.dart';
 import 'package:mobile/models/organization_model.dart';
@@ -27,7 +27,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final Color primaryColor = const Color(0xFF008080);
-  final EmergencyService _emergencyService = EmergencyService();
+  final ChatSocketService _socketService = ChatSocketService();
 
   List<VolunteerHonorModel> _topVolunteers = [];
   List<OrganizationModel> _topOrganizations = [];
@@ -111,7 +111,7 @@ class _HomePageState extends State<HomePage> {
         title: const Text('Xác nhận gửi SOS'),
         content: const Text(
           'Bạn có chắc chắn muốn gửi yêu cầu khẩn cấp không? '
-          'Hệ thống sẽ thông báo đến các tình nguyện viên gần bạn.',
+          'Hệ thống sẽ thông báo đến admin.',
         ),
         actions: [
           TextButton(
@@ -135,9 +135,9 @@ class _HomePageState extends State<HomePage> {
     setState(() => _isSendingEmergency = true);
 
     try {
-      await _emergencyService.createEmergency(
-        notes: 'Yêu cầu khẩn cấp từ trang chủ',
-      );
+      // Dùng Socket để gửi SOS (giống SosEmergencyPage)
+      // Backend tự lấy userId từ JWT token trong handshake
+      await _socketService.sendSOS(notes: 'Yêu cầu khẩn cấp từ trang chủ');
 
       if (!mounted) return;
 
@@ -152,16 +152,10 @@ class _HomePageState extends State<HomePage> {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Lỗi: ${e.toString()}'),
-          backgroundColor: Colors.red,
-          duration: const Duration(seconds: 3),
-        ),
+        SnackBar(content: Text('Lỗi gửi SOS: $e'), backgroundColor: Colors.red),
       );
     } finally {
-      if (mounted) {
-        setState(() => _isSendingEmergency = false);
-      }
+      if (mounted) setState(() => _isSendingEmergency = false);
     }
   }
 

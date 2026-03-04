@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:mobile/services/auth_service.dart';
+import 'package:mobile/services/chat/chat_socket_service.dart';
 import 'package:mobile/views/register.dart';
 import 'package:mobile/views/widget_tree.dart';
 
@@ -96,7 +97,10 @@ class _LoginPageState extends State<LoginPage> {
             ),
           );
 
-          // 4. Chuyển hướng vào WidgetTree
+          // 4. Tái kết nối Socket với token mới (fix lỗi đổi tài khoản)
+          ChatSocketService().reinitialize();
+
+          // 5. Chuyển hướng vào WidgetTree
           Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(builder: (context) => const WidgetTree()),

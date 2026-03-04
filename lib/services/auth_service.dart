@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:mobile/helper/file_compress.dart';
 import '../models/user_model.dart';
+import 'package:mobile/services/chat/chat_socket_service.dart';
 
 class AuthService {
   final String baseUrl =
@@ -22,27 +23,34 @@ class AuthService {
 
     while (retryCount <= maxRetries) {
       try {
-        print("=== DEBUG LOGIN (Attempt ${retryCount + 1}/${maxRetries + 1}) ===");
+        print(
+          "=== DEBUG LOGIN (Attempt ${retryCount + 1}/${maxRetries + 1}) ===",
+        );
         print("Endpoint: $baseUrl/auth/login");
         print("Phone: $phoneNumber");
 
         final uri = Uri.parse('$baseUrl/auth/login');
 
-        final response = await http.post(
-          uri,
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'ngrok-skip-browser-warning': 'true',
-            'User-Agent': 'BetterUS-Mobile-App',
-          },
-          body: jsonEncode({'phoneNumber': phoneNumber, 'password': password}),
-        ).timeout(
-          const Duration(seconds: 30),
-          onTimeout: () {
-            throw Exception('Kết nối đến server quá lâu. Vui lòng thử lại');
-          },
-        );
+        final response = await http
+            .post(
+              uri,
+              headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'ngrok-skip-browser-warning': 'true',
+                'User-Agent': 'BetterUS-Mobile-App',
+              },
+              body: jsonEncode({
+                'phoneNumber': phoneNumber,
+                'password': password,
+              }),
+            )
+            .timeout(
+              const Duration(seconds: 30),
+              onTimeout: () {
+                throw Exception('Kết nối đến server quá lâu. Vui lòng thử lại');
+              },
+            );
 
         print("Response status: ${response.statusCode}");
         print("Response body: ${response.body}");
@@ -73,7 +81,9 @@ class AuthService {
             final errorMessage = errorData['message'] ?? 'Đăng nhập thất bại';
             throw Exception(errorMessage);
           } catch (e) {
-            throw Exception('Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin');
+            throw Exception(
+              'Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin',
+            );
           }
         }
       } on SocketException catch (e) {
@@ -91,7 +101,7 @@ class AuthService {
             'Không thể kết nối đến server. Vui lòng kiểm tra:\n'
             '1. Kết nối internet\n'
             '2. Backend server đang chạy\n'
-            '3. Ngrok URL còn hoạt động'
+            '3. Ngrok URL còn hoạt động',
           );
         }
       } on TimeoutException {
@@ -141,8 +151,18 @@ class AuthService {
   }
 
   Future<void> logout() async {
+    // Ngắt kết nối socket trước khi xóa token
+    // Tránh việc Singleton ChatSocketService giữ lại token cũ
+    ChatSocketService().disconnect();
     await _storage.delete(key: 'token');
     currentUser = null;
+  }
+
+  Future<String?> getRole() async {
+    if (currentUser == null) {
+      await getMe();
+    }
+    return currentUser?.role;
   }
 
   Future<String?> getToken() async {
@@ -398,7 +418,6 @@ class AuthService {
       if (response.statusCode == 200 || response.statusCode == 201) {
         return true;
       } else {
-  
         final respStr = await response.stream.bytesToString();
         print("Lỗi từ Server TNV (${response.statusCode}): $respStr");
         return false;

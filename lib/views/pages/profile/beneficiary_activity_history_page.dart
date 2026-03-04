@@ -5,6 +5,8 @@ import 'package:mobile/services/feedback_service.dart';
 import 'package:mobile/views/pages/activities/request_detail_page.dart';
 import 'package:intl/intl.dart';
 
+import 'package:mobile/services/appreciation_service.dart';
+
 class BeneficiaryActivityHistoryPage extends StatefulWidget {
   const BeneficiaryActivityHistoryPage({Key? key}) : super(key: key);
 
@@ -17,6 +19,7 @@ class _BeneficiaryActivityHistoryPageState
     extends State<BeneficiaryActivityHistoryPage> {
   final RequestService _requestService = RequestService();
   final FeedbackService _feedbackService = FeedbackService();
+  final AppreciationService _appreciationService = AppreciationService();
   List<HelpRequestModel> _myRequests = [];
   bool _isLoading = true;
 
@@ -81,16 +84,16 @@ class _BeneficiaryActivityHistoryPageState
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _myRequests.isEmpty
-              ? _buildEmptyState()
-              : RefreshIndicator(
-                  onRefresh: _loadActivities,
-                  child: ListView.builder(
-                    padding: const EdgeInsets.all(16),
-                    itemCount: _myRequests.length,
-                    itemBuilder: (context, index) =>
-                        _buildActivityCard(_myRequests[index]),
-                  ),
-                ),
+          ? _buildEmptyState()
+          : RefreshIndicator(
+              onRefresh: _loadActivities,
+              child: ListView.builder(
+                padding: const EdgeInsets.all(16),
+                itemCount: _myRequests.length,
+                itemBuilder: (context, index) =>
+                    _buildActivityCard(_myRequests[index]),
+              ),
+            ),
     );
   }
 
@@ -99,11 +102,7 @@ class _BeneficiaryActivityHistoryPageState
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.history,
-            size: 80,
-            color: Colors.grey[300],
-          ),
+          Icon(Icons.history, size: 80, color: Colors.grey[300]),
           const SizedBox(height: 16),
           Text(
             'Chưa có yêu cầu nào',
@@ -116,10 +115,7 @@ class _BeneficiaryActivityHistoryPageState
           const SizedBox(height: 8),
           Text(
             'Tạo yêu cầu giúp đỡ để bắt đầu',
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey[500],
-            ),
+            style: TextStyle(fontSize: 14, color: Colors.grey[500]),
           ),
         ],
       ),
@@ -274,12 +270,11 @@ class _BeneficiaryActivityHistoryPageState
                           builder: (context) =>
                               RequestDetailPage(request: request),
                         ),
-                      ).then((_) => _loadActivities()); // Refresh sau khi quay lại
+                      ).then(
+                        (_) => _loadActivities(),
+                      ); // Refresh sau khi quay lại
                     },
-                    icon: const Icon(
-                      Icons.info_outline,
-                      size: 18,
-                    ),
+                    icon: const Icon(Icons.info_outline, size: 18),
                     label: const Text(
                       'Xem chi tiết',
                       style: TextStyle(
@@ -303,27 +298,35 @@ class _BeneficiaryActivityHistoryPageState
                 if (canSendAppreciation) ...[
                   const SizedBox(width: 12),
                   Expanded(
-                    child: ElevatedButton.icon(
-                      onPressed: () => _sendAppreciation(request),
-                      icon: const Icon(
-                        Icons.favorite,
-                        size: 18,
-                      ),
-                      label: const Text(
-                        'Cảm ơn',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14,
-                        ),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.pink,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
+                    child: FutureBuilder<bool>(
+                      future: _appreciationService.hasAppreciated(request.id),
+                      builder: (context, snapshot) {
+                        final hasAppreciated = snapshot.data ?? false;
+
+                        if (hasAppreciated) {
+                          return const SizedBox.shrink(); // Ẩn nút nếu đã cảm ơn xong
+                        }
+
+                        return ElevatedButton.icon(
+                          onPressed: () => _sendAppreciation(request),
+                          icon: const Icon(Icons.favorite, size: 18),
+                          label: const Text(
+                            'Cảm ơn',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                            ),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.pink,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                        );
+                      },
                     ),
                   ),
                 ],
@@ -350,9 +353,7 @@ class _BeneficiaryActivityHistoryPageState
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => const Center(
-        child: CircularProgressIndicator(),
-      ),
+      builder: (context) => const Center(child: CircularProgressIndicator()),
     );
 
     try {
@@ -390,10 +391,7 @@ class _BeneficiaryActivityHistoryPageState
       if (!mounted) return;
       Navigator.pop(context); // Đóng loading
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Lỗi: $e'),
-          backgroundColor: Colors.red,
-        ),
+        SnackBar(content: Text('Lỗi: $e'), backgroundColor: Colors.red),
       );
     }
   }

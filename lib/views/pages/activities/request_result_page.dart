@@ -3,14 +3,12 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:intl/intl.dart';
 import 'package:mobile/models/request_model.dart';
 import 'package:mobile/services/review_service.dart';
+import 'package:mobile/services/auth_service.dart'; // import để get Role
 
 class RequestResultPage extends StatefulWidget {
   final HelpRequestModel request;
 
-  const RequestResultPage({
-    Key? key,
-    required this.request,
-  }) : super(key: key);
+  const RequestResultPage({Key? key, required this.request}) : super(key: key);
 
   @override
   State<RequestResultPage> createState() => _RequestResultPageState();
@@ -18,11 +16,13 @@ class RequestResultPage extends StatefulWidget {
 
 class _RequestResultPageState extends State<RequestResultPage> {
   final ReviewService _reviewService = ReviewService();
+  final AuthService _authService = AuthService();
   final TextEditingController _commentController = TextEditingController();
   int _rating = 5;
   bool _isSubmitting = false;
   Map<String, dynamic>? _existingReview;
   bool _isCheckingReview = true;
+  String? _currentUserRole;
 
   @override
   void initState() {
@@ -31,7 +31,22 @@ class _RequestResultPageState extends State<RequestResultPage> {
   }
 
   Future<void> _checkIfReviewed() async {
-    final review = await _reviewService.getMyReviewForActivity(widget.request.id);
+    final role = await _authService.getRole();
+    _currentUserRole = role;
+
+    Map<String, dynamic>? review;
+    if (role == 'VOLUNTEER') {
+      // TNV xem review mà NCGD đã gửi cho mình
+      review = await _reviewService.getReceivedReviewForActivity(
+        widget.request.id,
+      );
+    } else {
+      // NCGD xem lại review mình đã viết
+      review = await _reviewService.getMySubmittedReviewForActivity(
+        widget.request.id,
+      );
+    }
+
     if (mounted) {
       setState(() {
         _existingReview = review;
@@ -85,10 +100,7 @@ class _RequestResultPageState extends State<RequestResultPage> {
       if (mounted) {
         setState(() => _isSubmitting = false);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Lỗi: $e'),
-            backgroundColor: Colors.red,
-          ),
+          SnackBar(content: Text('Lỗi: $e'), backgroundColor: Colors.red),
         );
       }
     }
@@ -202,7 +214,9 @@ class _RequestResultPageState extends State<RequestResultPage> {
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                DateFormat('dd/MM/yyyy HH:mm').format(widget.request.doneAt!),
+                                DateFormat(
+                                  'dd/MM/yyyy HH:mm',
+                                ).format(widget.request.doneAt!),
                                 style: const TextStyle(
                                   fontSize: 15,
                                   fontWeight: FontWeight.w600,
@@ -254,11 +268,12 @@ class _RequestResultPageState extends State<RequestResultPage> {
                           GridView.builder(
                             shrinkWrap: true,
                             physics: const NeverScrollableScrollPhysics(),
-                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 3,
-                              crossAxisSpacing: 10,
-                              mainAxisSpacing: 10,
-                            ),
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 3,
+                                  crossAxisSpacing: 10,
+                                  mainAxisSpacing: 10,
+                                ),
                             itemCount: widget.request.proofImages.length,
                             itemBuilder: (context, index) {
                               return ClipRRect(
@@ -268,12 +283,15 @@ class _RequestResultPageState extends State<RequestResultPage> {
                                   fit: BoxFit.cover,
                                   placeholder: (context, url) => Container(
                                     color: Colors.grey[200],
-                                    child: const Center(child: CircularProgressIndicator()),
+                                    child: const Center(
+                                      child: CircularProgressIndicator(),
+                                    ),
                                   ),
-                                  errorWidget: (context, url, error) => Container(
-                                    color: Colors.grey[200],
-                                    child: const Icon(Icons.error),
-                                  ),
+                                  errorWidget: (context, url, error) =>
+                                      Container(
+                                        color: Colors.grey[200],
+                                        child: const Icon(Icons.error),
+                                      ),
                                 ),
                               );
                             },
@@ -285,7 +303,8 @@ class _RequestResultPageState extends State<RequestResultPage> {
                   ],
 
                   // Ghi chú hoàn thành
-                  if (widget.request.completionNotes != null && widget.request.completionNotes!.isNotEmpty) ...[
+                  if (widget.request.completionNotes != null &&
+                      widget.request.completionNotes!.isNotEmpty) ...[
                     Container(
                       padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
@@ -341,105 +360,122 @@ class _RequestResultPageState extends State<RequestResultPage> {
                     const SizedBox(height: 20),
                   ],
 
-                  // Rating section - Chỉ hiển thị khi chưa có review
-                  if (_existingReview == null && !_isCheckingReview)
+                  // Rating section - Chỉ hiển thị FORM CHO NCGD khi CHƯA CÓ REVIEW
+                  if (_existingReview == null &&
+                      !_isCheckingReview &&
+                      _currentUserRole != 'VOLUNTEER')
                     Container(
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.05),
-                          blurRadius: 10,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            const Icon(
-                              Icons.star_rate,
-                              color: Colors.amber,
-                              size: 20,
-                            ),
-                            const SizedBox(width: 8),
-                            const Text(
-                              'Đánh giá tình nguyện viên',
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.05),
+                            blurRadius: 10,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              const Icon(
+                                Icons.star_rate,
+                                color: Colors.amber,
+                                size: 20,
+                              ),
+                              const SizedBox(width: 8),
+                              const Text(
+                                'Đánh giá tình nguyện viên',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+
+                          // Rating stars
+                          Wrap(
+                            alignment: WrapAlignment.center,
+                            spacing: 8.0,
+                            children: List.generate(5, (index) {
+                              return IconButton(
+                                onPressed: () =>
+                                    setState(() => _rating = index + 1),
+                                icon: Icon(
+                                  index < _rating
+                                      ? Icons.star
+                                      : Icons.star_border,
+                                  color: Colors.amber,
+                                  size: 40,
+                                ),
+                              );
+                            }),
+                          ),
+                          const SizedBox(height: 8),
+                          Center(
+                            child: Text(
+                              _rating == 5
+                                  ? 'Xuất sắc'
+                                  : _rating == 4
+                                  ? 'Tốt'
+                                  : _rating == 3
+                                  ? 'Khá'
+                                  : _rating == 2
+                                  ? 'Trung bình'
+                                  : 'Cần cải thiện',
                               style: TextStyle(
                                 fontSize: 16,
-                                fontWeight: FontWeight.bold,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.grey[700],
                               ),
                             ),
-                          ],
-                        ),
-                        const SizedBox(height: 16),
+                          ),
+                          const SizedBox(height: 16),
 
-                        // Rating stars
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: List.generate(5, (index) {
-                            return IconButton(
-                              onPressed: () => setState(() => _rating = index + 1),
-                              icon: Icon(
-                                index < _rating ? Icons.star : Icons.star_border,
-                                color: Colors.amber,
-                                size: 40,
+                          // Comment
+                          TextField(
+                            controller: _commentController,
+                            maxLines: 4,
+                            decoration: InputDecoration(
+                              hintText:
+                                  'Chia sẻ trải nghiệm của bạn về tình nguyện viên...',
+                              hintStyle: TextStyle(
+                                color: Colors.grey[400],
+                                fontSize: 14,
                               ),
-                            );
-                          }),
-                        ),
-                        const SizedBox(height: 8),
-                        Center(
-                          child: Text(
-                            _rating == 5
-                                ? 'Xuất sắc'
-                                : _rating == 4
-                                    ? 'Tốt'
-                                    : _rating == 3
-                                        ? 'Khá'
-                                        : _rating == 2
-                                            ? 'Trung bình'
-                                            : 'Cần cải thiện',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.grey[700],
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: BorderSide(
+                                  color: Colors.grey[300]!,
+                                ),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: BorderSide(
+                                  color: Colors.grey[300]!,
+                                ),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: const BorderSide(
+                                  color: Color(0xFF008080),
+                                  width: 2,
+                                ),
+                              ),
+                              filled: true,
+                              fillColor: Colors.grey[50],
+                              contentPadding: const EdgeInsets.all(16),
                             ),
                           ),
-                        ),
-                        const SizedBox(height: 16),
-
-                        // Comment
-                        TextField(
-                          controller: _commentController,
-                          maxLines: 4,
-                          decoration: InputDecoration(
-                            hintText: 'Chia sẻ trải nghiệm của bạn về tình nguyện viên...',
-                            hintStyle: TextStyle(color: Colors.grey[400], fontSize: 14),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(color: Colors.grey[300]!),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(color: Colors.grey[300]!),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(color: Color(0xFF008080), width: 2),
-                            ),
-                            filled: true,
-                            fillColor: Colors.grey[50],
-                            contentPadding: const EdgeInsets.all(16),
-                          ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
                 ],
               ),
             ),
@@ -461,8 +497,33 @@ class _RequestResultPageState extends State<RequestResultPage> {
               ),
               child: const SafeArea(
                 child: Center(
-                  child: CircularProgressIndicator(
-                    color: Color(0xFF008080),
+                  child: CircularProgressIndicator(color: Color(0xFF008080)),
+                ),
+              ),
+            )
+          else if (_existingReview == null && _currentUserRole == 'VOLUNTEER')
+            // TNV chưa được đánh giá
+            Container(
+              padding: const EdgeInsets.all(20),
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.1),
+                    blurRadius: 10,
+                    offset: const Offset(0, -2),
+                  ),
+                ],
+              ),
+              child: SafeArea(
+                child: Text(
+                  'Đang chờ người nhận giúp đỡ (NCGD) để lại đánh giá.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontStyle: FontStyle.italic,
+                    color: Colors.grey[600],
                   ),
                 ),
               ),
@@ -486,10 +547,7 @@ class _RequestResultPageState extends State<RequestResultPage> {
                   icon: const Icon(Icons.send, size: 20),
                   label: const Text(
                     'Gửi đánh giá',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF008080),
@@ -542,7 +600,9 @@ class _RequestResultPageState extends State<RequestResultPage> {
                           const SizedBox(width: 12),
                           Expanded(
                             child: Text(
-                              'Đánh giá của bạn',
+                              _currentUserRole == 'VOLUNTEER'
+                                  ? 'Đánh giá từ NCGD'
+                                  : 'Đánh giá của bạn',
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
@@ -566,7 +626,9 @@ class _RequestResultPageState extends State<RequestResultPage> {
                         }),
                       ),
                       if (_existingReview!['comment'] != null &&
-                          _existingReview!['comment'].toString().isNotEmpty) ...[
+                          _existingReview!['comment']
+                              .toString()
+                              .isNotEmpty) ...[
                         const SizedBox(height: 12),
                         Container(
                           width: double.infinity,

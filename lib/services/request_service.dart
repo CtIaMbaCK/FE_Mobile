@@ -194,7 +194,9 @@ class RequestService {
       if (response.statusCode == 200) {
         return true;
       } else {
-        print("Lỗi chấp nhận request: ${response.statusCode} - ${response.body}");
+        print(
+          "Lỗi chấp nhận request: ${response.statusCode} - ${response.body}",
+        );
         return false;
       }
     } catch (e) {
@@ -257,11 +259,43 @@ class RequestService {
         print('✅ Hoàn thành request thành công');
         return true;
       } else {
-        print('❌ Lỗi complete request: ${response.statusCode} - ${response.body}');
+        print(
+          '❌ Lỗi complete request: ${response.statusCode} - ${response.body}',
+        );
         return false;
       }
     } catch (e) {
       print('❌ Lỗi kết nối API completeRequest: $e');
+      return false;
+    }
+  }
+
+  /// NCGD hủy yêu cầu của mình (Chỉ khi status = PENDING)
+  Future<bool> cancelRequest(String requestId) async {
+    try {
+      String? token = await _authService.getToken();
+      if (token == null) return false;
+
+      final response = await http.patch(
+        Uri.parse('$baseUrl/request/$requestId/cancel'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+          'ngrok-skip-browser-warning': 'true',
+        },
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        print('✅ Hủy yêu cầu thành công');
+        return true;
+      } else {
+        print(
+          '❌ Lỗi cancel request: ${response.statusCode} - ${response.body}',
+        );
+        return false;
+      }
+    } catch (e) {
+      print('❌ Lỗi kết nối API cancelRequest: $e');
       return false;
     }
   }

@@ -7,13 +7,15 @@ class ReviewService {
       "https://frettiest-ariella-unnationally.ngrok-free.dev/api/v1";
   final AuthService _authService = AuthService();
 
-  /// Lấy review đã gửi cho activity
-  Future<Map<String, dynamic>?> getMyReviewForActivity(String activityId) async {
+  /// Lấy đánh giá MÀ TÔI MỚI NHẬN ĐƯỢC từ người khác (VD: TNV xem đánh giá NCGD gửi)
+  Future<Map<String, dynamic>?> getReceivedReviewForActivity(
+    String activityId,
+  ) async {
     try {
       String? token = await _authService.getToken();
       if (token == null) return null;
 
-      // Lấy danh sách reviews đã gửi từ backend
+      // /my-reviews trả về danh sách đánh giá MÌNH NHẬN ĐƯỢC
       final response = await http.get(
         Uri.parse('$baseUrl/feedback/my-reviews'),
         headers: {
@@ -26,7 +28,9 @@ class ReviewService {
         final List reviews = jsonDecode(response.body);
         try {
           return reviews.firstWhere(
-            (item) => item['activity'] != null && item['activity']['id'] == activityId,
+            (item) =>
+                item['activity'] != null &&
+                item['activity']['id'] == activityId,
           );
         } catch (e) {
           return null;
@@ -34,14 +38,49 @@ class ReviewService {
       }
       return null;
     } catch (e) {
-      print('❌ Lỗi lấy review: $e');
+      print('❌ Lỗi lấy review nhận được: $e');
       return null;
     }
   }
 
-  /// Kiểm tra đã gửi review chưa
+  /// Lấy đánh giá MÀ TÔI ĐÃ GỬI (VD: NCGD xem lại đánh giá đã gửi cho TNV)
+  Future<Map<String, dynamic>?> getMySubmittedReviewForActivity(
+    String activityId,
+  ) async {
+    try {
+      String? token = await _authService.getToken();
+      if (token == null) return null;
+
+      final response = await http.get(
+        Uri.parse('$baseUrl/feedback/my-submitted-reviews'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'ngrok-skip-browser-warning': 'true',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final List reviews = jsonDecode(response.body);
+        try {
+          return reviews.firstWhere(
+            (item) =>
+                item['activity'] != null &&
+                item['activity']['id'] == activityId,
+          );
+        } catch (e) {
+          return null;
+        }
+      }
+      return null;
+    } catch (e) {
+      print('❌ Lỗi lấy review đã gửi: $e');
+      return null;
+    }
+  }
+
+  /// Kiểm tra đã gửi review chưa (NCGD check)
   Future<bool> hasReviewed(String activityId) async {
-    final review = await getMyReviewForActivity(activityId);
+    final review = await getMySubmittedReviewForActivity(activityId);
     return review != null;
   }
 
@@ -74,7 +113,9 @@ class ReviewService {
         }),
       );
 
-      print('📤 Gửi review cho activity: $activityId, target: $targetId - Rating: $rating');
+      print(
+        '📤 Gửi review cho activity: $activityId, target: $targetId - Rating: $rating',
+      );
       print('Response: ${response.statusCode}');
       if (response.statusCode != 200 && response.statusCode != 201) {
         print('Response body: ${response.body}');
@@ -83,6 +124,35 @@ class ReviewService {
       return response.statusCode == 200 || response.statusCode == 201;
     } catch (e) {
       print('❌ Lỗi gửi review: $e');
+      return false;
+    }
+  }
+
+  /// Kiểm tra xem mình đã gửi lời cảm ơn cho Activity này chưa
+  Future<bool> hasAppreciated(String activityId) async {
+    try {
+      String? token = await _authService.getToken();
+      if (token == null) return false;
+
+      final response = await http.get(
+        Uri.parse('$baseUrl/feedback/my-submitted-appreciations'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'ngrok-skip-browser-warning': 'true',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final List appreciations = jsonDecode(response.body);
+        final found = appreciations.any(
+          (item) =>
+              item['activity'] != null && item['activity']['id'] == activityId,
+        );
+        return found;
+      }
+      return false;
+    } catch (e) {
+      print('❌ Lỗi lấy danh sách cảm ơn đã gửi: $e');
       return false;
     }
   }

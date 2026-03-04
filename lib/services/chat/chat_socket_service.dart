@@ -12,7 +12,8 @@ class ChatSocketService {
   final _storage = const FlutterSecureStorage();
 
   // Base URL - cần update theo ngrok URL của bạn
-  static const String _baseUrl = 'https://frettiest-ariella-unnationally.ngrok-free.dev';
+  static const String _baseUrl =
+      'https://frettiest-ariella-unnationally.ngrok-free.dev';
 
   // Callbacks
   Function(MessageModel)? onNewMessage;
@@ -68,20 +69,18 @@ class ChatSocketService {
         IO.OptionBuilder()
             .setTransports(['websocket'])
             .enableAutoConnect()
-            .setAuth({
-              'token': token,
-            })
+            .setAuth({'token': token})
             .setExtraHeaders({
               'Authorization': 'Bearer $token',
               'ngrok-skip-browser-warning': 'true',
             })
             // Thêm timeout để tránh treo khi mạng 4G chậm
-            .setTimeout(10000)  // 10 seconds timeout
+            .setTimeout(10000) // 10 seconds timeout
             // Thêm reconnection settings
             .enableReconnection()
             .setReconnectionAttempts(_maxReconnectAttempts)
             .setReconnectionDelay(_reconnectDelay.inMilliseconds)
-            .setReconnectionDelayMax(10000)  // Max 10s between attempts
+            .setReconnectionDelayMax(10000) // Max 10s between attempts
             .build(),
       );
 
@@ -89,7 +88,7 @@ class ChatSocketService {
       _socket!.onConnect((_) {
         print('✅ Socket connected! ID: ${_socket!.id}');
         _isConnecting = false;
-        _reconnectAttempts = 0;  // Reset counter on successful connection
+        _reconnectAttempts = 0; // Reset counter on successful connection
       });
 
       _socket!.onConnectError((data) {
@@ -99,9 +98,13 @@ class ChatSocketService {
 
         if (onError != null) {
           if (_reconnectAttempts >= _maxReconnectAttempts) {
-            onError!('Không thể kết nối server. Vui lòng kiểm tra kết nối mạng.');
+            onError!(
+              'Không thể kết nối server. Vui lòng kiểm tra kết nối mạng.',
+            );
           } else {
-            onError!('Đang thử kết nối lại... (${_reconnectAttempts}/$_maxReconnectAttempts)');
+            onError!(
+              'Đang thử kết nối lại... (${_reconnectAttempts}/$_maxReconnectAttempts)',
+            );
           }
         }
       });
@@ -175,10 +178,7 @@ class ChatSocketService {
       _socket!.on('conversation_read', (data) {
         print('👁️ Conversation read: ${data['conversationId']}');
         if (onConversationRead != null) {
-          onConversationRead!(
-            data['conversationId'],
-            data['userId'],
-          );
+          onConversationRead!(data['conversationId'], data['userId']);
         }
       });
 
@@ -227,7 +227,6 @@ class ChatSocketService {
           onSOSAlert!(Map<String, dynamic>.from(data));
         }
       });
-
     } catch (e) {
       print('Socket connection error: $e');
       if (onError != null) {
@@ -244,6 +243,15 @@ class ChatSocketService {
     _socket?.disconnect();
     _socket?.dispose();
     _socket = null;
+  }
+
+  // Tái khởi động socket với token mới (dùng khi đổi tài khoản)
+  Future<void> reinitialize() async {
+    print('🔄 Re-initializing socket with new token...');
+    disconnect();
+    clearCallbacks();
+    await Future.delayed(const Duration(milliseconds: 300));
+    await connect();
   }
 
   // Kết nối lại thủ công (dùng khi mạng trở lại)
@@ -289,18 +297,14 @@ class ChatSocketService {
   void markMessageAsRead(String messageId) {
     if (!isConnected) return;
 
-    _socket!.emit('mark_read', {
-      'messageId': messageId,
-    });
+    _socket!.emit('mark_read', {'messageId': messageId});
   }
 
   // Đánh dấu đã đọc toàn bộ conversation
   void markConversationAsRead(String conversationId) {
     if (!isConnected) return;
 
-    _socket!.emit('mark_conversation_read', {
-      'conversationId': conversationId,
-    });
+    _socket!.emit('mark_conversation_read', {'conversationId': conversationId});
   }
 
   // Gửi typing indicator
@@ -330,9 +334,7 @@ class ChatSocketService {
     }
 
     print('🚨 Sending SOS emergency signal...');
-    _socket!.emit('send_sos', {
-      if (notes != null) 'notes': notes,
-    });
+    _socket!.emit('send_sos', {if (notes != null) 'notes': notes});
   }
 
   // Clear all callbacks (khi dispose widget)

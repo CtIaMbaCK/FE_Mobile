@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:mobile/services/auth_service.dart';
 import 'package:mobile/views/login.dart';
 import 'package:mobile/views/widgets/build_widget.dart';
@@ -87,81 +88,207 @@ class _SetupVolunteerProfileState extends State<SetupVolunteerProfile> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          "Hoàn thiện hồ sơ TNV",
-          style: GoogleFonts.roboto(fontSize: 18),
-        ),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 10),
-            buildFormTextField(
-              controller: _fullNameController,
-              label: "Họ và Tên (Bắt buộc)",
-            ),
-            buildFormTextField(
-              controller: _expController,
-              label: "Số năm kinh nghiệm (Bắt buộc)",
-              keyboardType: TextInputType.number,
-            ),
-            buildFormTextArea(
-              controller: _bioController,
-              label: "Giới thiệu bản thân (Tùy chọn)",
-              minLines: 3,
-            ),
-
-            const SizedBox(height: 20),
-            Text(
-              "Giấy tờ xác minh & Ảnh đại diện",
-              style: GoogleFonts.roboto(
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-                color: const Color(0xFF008080),
+      backgroundColor: const Color(0xFFF8FAFC),
+      body: Stack(
+        children: [
+          // Background Decorative Elements for Soft UI
+          Positioned(
+            top: -100,
+            right: -50,
+            child: Container(
+              width: 300,
+              height: 300,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: const Color(0xFF008080).withValues(alpha: 0.05),
               ),
             ),
-            const SizedBox(height: 15),
-
-            _buildFilePicker(
-              "Ảnh đại diện chân dung",
-              _avatarFile,
-              (f) => setState(() => _avatarFile = f),
+          ),
+          Positioned(
+            bottom: -50,
+            left: -100,
+            child: Container(
+              width: 250,
+              height: 250,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: const Color(0xFF008080).withValues(alpha: 0.08),
+              ),
             ),
-            _buildFilePicker(
-              "CCCD Mặt trước",
-              _cccdFrontFile,
-              (f) => setState(() => _cccdFrontFile = f),
-            ),
-            _buildFilePicker(
-              "CCCD Mặt sau",
-              _cccdBackFile,
-              (f) => setState(() => _cccdBackFile = f),
-            ),
-
-            const SizedBox(height: 40),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF008080),
-                minimumSize: const Size(double.infinity, 55),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+          ),
+          SafeArea(
+            child: Column(
+              children: [
+                // Custom App Bar
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
+                  child: Row(
+                    children: [
+                      IconButton(
+                        icon: const Icon(
+                          Icons.arrow_back_ios_new,
+                          color: Color(0xFF008080),
+                        ),
+                        onPressed: () => Navigator.pop(context),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        "Hoàn thiện hồ sơ",
+                        style: GoogleFonts.roboto(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                          color: const Color(0xFF0F172A),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              onPressed: _submit,
-              child: const Text(
-                "HOÀN TẤT ĐĂNG KÝ",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 16,
+                    ),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.9),
+                        borderRadius: BorderRadius.circular(32),
+                        border: Border.all(color: Colors.white, width: 2),
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(
+                              0xFF008080,
+                            ).withValues(alpha: 0.06),
+                            blurRadius: 40,
+                            offset: const Offset(0, 20),
+                            spreadRadius: -5,
+                          ),
+                        ],
+                      ),
+                      padding: const EdgeInsets.all(24),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 10,
+                            ),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFF1F5F9),
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            child: Row(
+                              children: [
+                                const Icon(
+                                  Icons.volunteer_activism,
+                                  color: Color(0xFF10B981),
+                                  size: 20,
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Text(
+                                    "Tình nguyện viên (TNV)",
+                                    style: GoogleFonts.roboto(
+                                      fontWeight: FontWeight.w600,
+                                      color: const Color(0xFF334155),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+
+                          buildFormTextField(
+                            controller: _fullNameController,
+                            label: "Họ và Tên (Bắt buộc)",
+                          ),
+                          buildFormTextField(
+                            controller: _expController,
+                            label: "Số năm kinh nghiệm (Bắt buộc)",
+                            keyboardType: TextInputType.number,
+                          ),
+                          buildFormTextArea(
+                            controller: _bioController,
+                            label: "Giới thiệu bản thân (Tùy chọn)",
+                            minLines: 3,
+                          ),
+
+                          const Divider(height: 48, color: Color(0xFFE2E8F0)),
+                          Text(
+                            "Giấy tờ xác minh & Ảnh đại diện",
+                            style: GoogleFonts.roboto(
+                              fontWeight: FontWeight.w700,
+                              fontSize: 16,
+                              color: const Color(0xFF0F172A),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+
+                          _buildFilePicker(
+                            "Ảnh đại diện chân dung",
+                            _avatarFile,
+                            (f) => setState(() => _avatarFile = f),
+                          ),
+                          _buildFilePicker(
+                            "CCCD Mặt trước",
+                            _cccdFrontFile,
+                            (f) => setState(() => _cccdFrontFile = f),
+                          ),
+                          _buildFilePicker(
+                            "CCCD Mặt sau",
+                            _cccdBackFile,
+                            (f) => setState(() => _cccdBackFile = f),
+                          ),
+
+                          const SizedBox(height: 32),
+                          Container(
+                            width: double.infinity,
+                            height: 56,
+                            decoration: BoxDecoration(
+                              boxShadow: [
+                                BoxShadow(
+                                  color: const Color(
+                                    0xFF008080,
+                                  ).withValues(alpha: 0.3),
+                                  blurRadius: 20,
+                                  offset: const Offset(0, 8),
+                                ),
+                              ],
+                            ),
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF008080),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                elevation: 0,
+                              ),
+                              onPressed: _submit,
+                              child: Text(
+                                "HOÀN TẤT ĐĂNG KÝ",
+                                style: GoogleFonts.roboto(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w800,
+                                  fontSize: 16,
+                                  letterSpacing: 1,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ).animate().fade(duration: 500.ms).slideY(begin: 0.1, end: 0),
                 ),
-              ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -174,15 +301,25 @@ class _SetupVolunteerProfileState extends State<SetupVolunteerProfile> {
         color: const Color(0xFFF1F4F8),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: file == null ? Colors.black : Colors.green,
-          width: 1,
+          color: file == null
+              ? Colors.transparent
+              : Colors.green.withValues(alpha: 0.5),
+          width: 1.5,
         ),
       ),
       child: ListTile(
-        title: Text(label, style: GoogleFonts.roboto(fontSize: 14)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        title: Text(
+          label,
+          style: GoogleFonts.roboto(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            color: const Color(0xFF334155),
+          ),
+        ),
         trailing: Icon(
           file == null ? Icons.add_a_photo_outlined : Icons.check_circle,
-          color: file == null ? Colors.black54 : Colors.green,
+          color: file == null ? const Color(0xFF64748B) : Colors.green,
         ),
         onTap: () async {
           final img = await ImagePicker().pickImage(

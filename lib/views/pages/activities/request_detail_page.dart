@@ -142,10 +142,7 @@ class _RequestDetailPageState extends State<RequestDetailPage> {
       if (mounted) {
         setState(() => _isAccepting = false);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Lỗi: $e'),
-            backgroundColor: Colors.red,
-          ),
+          SnackBar(content: Text('Lỗi: $e'), backgroundColor: Colors.red),
         );
       }
     }
@@ -182,7 +179,9 @@ class _RequestDetailPageState extends State<RequestDetailPage> {
 
     final lat = _currentRequest.latitude;
     final lng = _currentRequest.longitude;
-    final url = Uri.parse('https://www.google.com/maps/dir/?api=1&destination=$lat,$lng');
+    final url = Uri.parse(
+      'https://www.google.com/maps/dir/?api=1&destination=$lat,$lng',
+    );
 
     try {
       if (await canLaunchUrl(url)) {
@@ -200,10 +199,7 @@ class _RequestDetailPageState extends State<RequestDetailPage> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Lỗi: $e'),
-            backgroundColor: Colors.red,
-          ),
+          SnackBar(content: Text('Lỗi: $e'), backgroundColor: Colors.red),
         );
       }
     }
@@ -238,11 +234,17 @@ class _RequestDetailPageState extends State<RequestDetailPage> {
                               fit: BoxFit.cover,
                               placeholder: (context, url) => Container(
                                 color: Colors.grey[300],
-                                child: const Center(child: CircularProgressIndicator()),
+                                child: const Center(
+                                  child: CircularProgressIndicator(),
+                                ),
                               ),
                               errorWidget: (context, url, error) => Container(
                                 color: Colors.grey[300],
-                                child: const Icon(Icons.image, size: 50, color: Colors.grey),
+                                child: const Icon(
+                                  Icons.image,
+                                  size: 50,
+                                  color: Colors.grey,
+                                ),
                               ),
                             ),
                             Container(
@@ -270,12 +272,18 @@ class _RequestDetailPageState extends State<RequestDetailPage> {
                                   children: List.generate(
                                     _currentRequest.activityImages.length,
                                     (i) => Container(
-                                      margin: const EdgeInsets.symmetric(horizontal: 3),
+                                      margin: const EdgeInsets.symmetric(
+                                        horizontal: 3,
+                                      ),
                                       width: i == index ? 24 : 8,
                                       height: 8,
                                       decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(4),
-                                        color: i == index ? Colors.white : Colors.white.withValues(alpha: 0.5),
+                                        color: i == index
+                                            ? Colors.white
+                                            : Colors.white.withValues(
+                                                alpha: 0.5,
+                                              ),
                                       ),
                                     ),
                                   ),
@@ -287,7 +295,11 @@ class _RequestDetailPageState extends State<RequestDetailPage> {
                     )
                   : Container(
                       color: const Color(0xFF008080),
-                      child: const Icon(Icons.image, size: 80, color: Colors.white),
+                      child: const Icon(
+                        Icons.image,
+                        size: 80,
+                        color: Colors.white,
+                      ),
                     ),
             ),
           ),
@@ -314,7 +326,10 @@ class _RequestDetailPageState extends State<RequestDetailPage> {
                     children: [
                       // Status Badge
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
                         decoration: BoxDecoration(
                           color: _getStatusColor(_currentRequest.status),
                           borderRadius: BorderRadius.circular(20),
@@ -342,7 +357,8 @@ class _RequestDetailPageState extends State<RequestDetailPage> {
                       ),
 
                       // Description
-                      if (_currentRequest.description != null && _currentRequest.description!.isNotEmpty) ...[
+                      if (_currentRequest.description != null &&
+                          _currentRequest.description!.isNotEmpty) ...[
                         const SizedBox(height: 12),
                         Text(
                           _currentRequest.description!,
@@ -368,15 +384,19 @@ class _RequestDetailPageState extends State<RequestDetailPage> {
                         icon: Icons.category_outlined,
                         iconColor: const Color(0xFF008080),
                         title: 'Loại hoạt động',
-                        value: _getActivityTypeName(_currentRequest.activityType),
+                        value: _getActivityTypeName(
+                          _currentRequest.activityType,
+                        ),
                       ),
                       _buildAddressCard(),
                       _buildInfoCard(
                         icon: Icons.calendar_today_outlined,
                         iconColor: Colors.blue,
                         title: 'Thời gian thực hiện',
-                        value: 'Từ ${_formatDate(_currentRequest.startDate)} đến ${_formatDate(_currentRequest.endDate ?? _currentRequest.startDate)}',
-                        subtitle: '${_formatTime(_currentRequest.startTime)} - ${_formatTime(_currentRequest.endTime)}',
+                        value:
+                            'Từ ${_formatDate(_currentRequest.startDate)} đến ${_formatDate(_currentRequest.endDate ?? _currentRequest.startDate)}',
+                        subtitle:
+                            '${_formatTime(_currentRequest.startTime)} - ${_formatTime(_currentRequest.endTime)}',
                       ),
                       _buildInfoCard(
                         icon: Icons.repeat_outlined,
@@ -386,13 +406,18 @@ class _RequestDetailPageState extends State<RequestDetailPage> {
                       ),
                       _buildInfoCard(
                         icon: Icons.priority_high_outlined,
-                        iconColor: _currentRequest.urgencyLevel == 'CRITICAL' ? Colors.red : Colors.green,
+                        iconColor: _currentRequest.urgencyLevel == 'CRITICAL'
+                            ? Colors.red
+                            : Colors.green,
                         title: 'Mức độ khẩn cấp',
-                        value: _currentRequest.urgencyLevel == 'CRITICAL' ? 'Khẩn cấp' : 'Bình thường',
+                        value: _currentRequest.urgencyLevel == 'CRITICAL'
+                            ? 'Khẩn cấp'
+                            : 'Bình thường',
                       ),
 
                       // Proof Images
-                      if (_currentRequest.status == 'COMPLETED' && _currentRequest.proofImages.isNotEmpty) ...[
+                      if (_currentRequest.status == 'COMPLETED' &&
+                          _currentRequest.proofImages.isNotEmpty) ...[
                         const SizedBox(height: 8),
                         Container(
                           padding: const EdgeInsets.all(20),
@@ -415,38 +440,64 @@ class _RequestDetailPageState extends State<RequestDetailPage> {
                                   Container(
                                     padding: const EdgeInsets.all(8),
                                     decoration: BoxDecoration(
-                                      color: Colors.green.withValues(alpha: 0.1),
+                                      color: Colors.green.withValues(
+                                        alpha: 0.1,
+                                      ),
                                       borderRadius: BorderRadius.circular(8),
                                     ),
-                                    child: const Icon(Icons.check_circle_outline, color: Colors.green, size: 20),
+                                    child: const Icon(
+                                      Icons.check_circle_outline,
+                                      color: Colors.green,
+                                      size: 20,
+                                    ),
                                   ),
                                   const SizedBox(width: 12),
-                                  const Text('Ảnh minh chứng hoàn thành', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                                  const Text(
+                                    'Ảnh minh chứng hoàn thành',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
                                 ],
                               ),
                               const SizedBox(height: 16),
                               GridView.builder(
                                 shrinkWrap: true,
                                 physics: const NeverScrollableScrollPhysics(),
-                                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: 3,
-                                  crossAxisSpacing: 8,
-                                  mainAxisSpacing: 8,
-                                ),
+                                gridDelegate:
+                                    const SliverGridDelegateWithFixedCrossAxisCount(
+                                      crossAxisCount: 3,
+                                      crossAxisSpacing: 8,
+                                      mainAxisSpacing: 8,
+                                    ),
                                 itemCount: _currentRequest.proofImages.length,
                                 itemBuilder: (context, index) {
                                   return ClipRRect(
                                     borderRadius: BorderRadius.circular(12),
                                     child: CachedNetworkImage(
-                                      imageUrl: _currentRequest.proofImages[index],
+                                      imageUrl:
+                                          _currentRequest.proofImages[index],
                                       fit: BoxFit.cover,
-                                      placeholder: (context, url) => Container(color: Colors.grey[200], child: const Center(child: CircularProgressIndicator())),
-                                      errorWidget: (context, url, error) => Container(color: Colors.grey[200], child: const Icon(Icons.error)),
+                                      placeholder: (context, url) => Container(
+                                        color: Colors.grey[200],
+                                        child: const Center(
+                                          child: CircularProgressIndicator(),
+                                        ),
+                                      ),
+                                      errorWidget: (context, url, error) =>
+                                          Container(
+                                            color: Colors.grey[200],
+                                            child: const Icon(Icons.error),
+                                          ),
                                     ),
                                   );
                                 },
                               ),
-                              if (_currentRequest.completionNotes != null && _currentRequest.completionNotes!.isNotEmpty) ...[
+                              if (_currentRequest.completionNotes != null &&
+                                  _currentRequest
+                                      .completionNotes!
+                                      .isNotEmpty) ...[
                                 const SizedBox(height: 16),
                                 Container(
                                   padding: const EdgeInsets.all(12),
@@ -455,11 +506,26 @@ class _RequestDetailPageState extends State<RequestDetailPage> {
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
-                                      const Text('Ghi chú:', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.grey)),
+                                      const Text(
+                                        'Ghi chú:',
+                                        style: TextStyle(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.grey,
+                                        ),
+                                      ),
                                       const SizedBox(height: 4),
-                                      Text(_currentRequest.completionNotes!, style: TextStyle(fontSize: 14, color: Colors.grey[800], height: 1.4)),
+                                      Text(
+                                        _currentRequest.completionNotes!,
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.grey[800],
+                                          height: 1.4,
+                                        ),
+                                      ),
                                     ],
                                   ),
                                 ),
@@ -474,7 +540,9 @@ class _RequestDetailPageState extends State<RequestDetailPage> {
                           icon: Icons.event_available_outlined,
                           iconColor: Colors.green,
                           title: 'Hoàn thành lúc',
-                          value: DateFormat('dd/MM/yyyy HH:mm').format(_currentRequest.doneAt!),
+                          value: DateFormat(
+                            'dd/MM/yyyy HH:mm',
+                          ).format(_currentRequest.doneAt!),
                         ),
 
                       // Rating form cho NCGD khi hoạt động COMPLETED
@@ -499,7 +567,8 @@ class _RequestDetailPageState extends State<RequestDetailPage> {
   Widget _buildAddressCard() {
     final currentUser = AuthService.currentUser;
     final isVolunteer = currentUser?.role == 'VOLUNTEER';
-    final hasCoordinates = _currentRequest.latitude != null && _currentRequest.longitude != null;
+    final hasCoordinates =
+        _currentRequest.latitude != null && _currentRequest.longitude != null;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -524,18 +593,33 @@ class _RequestDetailPageState extends State<RequestDetailPage> {
               color: Colors.orange.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: const Icon(Icons.location_on_outlined, color: Colors.orange, size: 22),
+            child: const Icon(
+              Icons.location_on_outlined,
+              color: Colors.orange,
+              size: 22,
+            ),
           ),
           const SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Địa chỉ', style: TextStyle(fontSize: 13, color: Colors.grey[600], fontWeight: FontWeight.w500)),
+                Text(
+                  'Địa chỉ',
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: Colors.grey[600],
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
                 const SizedBox(height: 4),
                 Text(
                   '${_currentRequest.addressDetail}\n${_getDistrictName(_currentRequest.district)}',
-                  style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600, height: 1.4),
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    height: 1.4,
+                  ),
                 ),
                 if (isVolunteer && hasCoordinates) ...[
                   const SizedBox(height: 12),
@@ -546,12 +630,18 @@ class _RequestDetailPageState extends State<RequestDetailPage> {
                       icon: const Icon(Icons.directions, size: 18),
                       label: const Text(
                         'Xem đường đi trên Google Maps',
-                        style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.orange,
                         foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 10,
+                          horizontal: 12,
+                        ),
                         elevation: 0,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
@@ -605,12 +695,29 @@ class _RequestDetailPageState extends State<RequestDetailPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title, style: TextStyle(fontSize: 13, color: Colors.grey[600], fontWeight: FontWeight.w500)),
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: Colors.grey[600],
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
                 const SizedBox(height: 4),
-                Text(value, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600, height: 1.4)),
+                Text(
+                  value,
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    height: 1.4,
+                  ),
+                ),
                 if (subtitle != null) ...[
                   const SizedBox(height: 4),
-                  Text(subtitle, style: TextStyle(fontSize: 13, color: Colors.grey[600])),
+                  Text(
+                    subtitle,
+                    style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+                  ),
                 ],
               ],
             ),
@@ -633,7 +740,13 @@ class _RequestDetailPageState extends State<RequestDetailPage> {
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           color: Colors.white,
-          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 10, offset: const Offset(0, -2))],
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.1),
+              blurRadius: 10,
+              offset: const Offset(0, -2),
+            ),
+          ],
         ),
         child: SafeArea(
           child: ElevatedButton(
@@ -642,14 +755,33 @@ class _RequestDetailPageState extends State<RequestDetailPage> {
               backgroundColor: const Color(0xFF008080),
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(vertical: 16),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
               elevation: 0,
             ),
             child: _isAccepting
-                ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, valueColor: AlwaysStoppedAnimation<Color>(Colors.white)))
+                ? const SizedBox(
+                    height: 20,
+                    width: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                    ),
+                  )
                 : const Row(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: [Icon(Icons.check_circle_outline, size: 24), SizedBox(width: 8), Text('Chấp nhận yêu cầu', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold))],
+                    children: [
+                      Icon(Icons.check_circle_outline, size: 24),
+                      SizedBox(width: 8),
+                      Text(
+                        'Chấp nhận yêu cầu',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
                   ),
           ),
         ),
@@ -661,7 +793,13 @@ class _RequestDetailPageState extends State<RequestDetailPage> {
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           color: Colors.white,
-          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 10, offset: const Offset(0, -2))],
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.1),
+              blurRadius: 10,
+              offset: const Offset(0, -2),
+            ),
+          ],
         ),
         child: SafeArea(
           child: ElevatedButton(
@@ -670,12 +808,21 @@ class _RequestDetailPageState extends State<RequestDetailPage> {
               backgroundColor: Colors.green,
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(vertical: 16),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
               elevation: 0,
             ),
             child: const Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: [Icon(Icons.task_alt, size: 24), SizedBox(width: 8), Text('Hoàn thành yêu cầu', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold))],
+              children: [
+                Icon(Icons.task_alt, size: 24),
+                SizedBox(width: 8),
+                Text(
+                  'Hoàn thành yêu cầu',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+              ],
             ),
           ),
         ),
@@ -748,10 +895,7 @@ class _RequestDetailPageState extends State<RequestDetailPage> {
                     SizedBox(height: 4),
                     Text(
                       'Đánh giá chất lượng hỗ trợ',
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: Color(0xFF757575),
-                      ),
+                      style: TextStyle(fontSize: 13, color: Color(0xFF757575)),
                     ),
                   ],
                 ),
@@ -771,8 +915,9 @@ class _RequestDetailPageState extends State<RequestDetailPage> {
             ),
           ),
           const SizedBox(height: 12),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+          Wrap(
+            alignment: WrapAlignment.center,
+            spacing: 8.0,
             children: List.generate(5, (index) {
               final starValue = index + 1;
               return GestureDetector(
@@ -782,10 +927,12 @@ class _RequestDetailPageState extends State<RequestDetailPage> {
                   });
                 },
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 2,
+                  ), // Giảm padding ngang
                   child: Icon(
                     starValue <= _rating ? Icons.star : Icons.star_border,
-                    size: 48,
+                    size: 40, // Giảm kích cỡ sao xuống một chút
                     color: Colors.amber,
                   ),
                 ),
@@ -824,7 +971,10 @@ class _RequestDetailPageState extends State<RequestDetailPage> {
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: const BorderSide(color: Color(0xFF008080), width: 2),
+                borderSide: const BorderSide(
+                  color: Color(0xFF008080),
+                  width: 2,
+                ),
               ),
             ),
           ),
@@ -896,7 +1046,9 @@ class _RequestDetailPageState extends State<RequestDetailPage> {
         activityId: _currentRequest.id,
         targetId: _currentRequest.volunteerId!,
         rating: _rating,
-        comment: _commentController.text.trim().isEmpty ? null : _commentController.text.trim(),
+        comment: _commentController.text.trim().isEmpty
+            ? null
+            : _commentController.text.trim(),
       );
 
       if (!mounted) return;
@@ -931,10 +1083,7 @@ class _RequestDetailPageState extends State<RequestDetailPage> {
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Lỗi: $e'),
-          backgroundColor: Colors.red,
-        ),
+        SnackBar(content: Text('Lỗi: $e'), backgroundColor: Colors.red),
       );
     } finally {
       if (mounted) {
