@@ -415,6 +415,9 @@ class _RequestDetailPageState extends State<RequestDetailPage> {
                             : 'Bình thường',
                       ),
 
+                      // Hiển thị thông tin Người cần giúp đỡ (NCGD)
+                      _buildRequesterInfoCard(),
+
                       // Proof Images
                       if (_currentRequest.status == 'COMPLETED' &&
                           _currentRequest.proofImages.isNotEmpty) ...[
@@ -648,6 +651,90 @@ class _RequestDetailPageState extends State<RequestDetailPage> {
                         ),
                       ),
                     ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRequesterInfoCard() {
+    final requester = _currentRequest.requester;
+    if (requester == null) return const SizedBox.shrink();
+
+    final String fullName = requester['fullName'] ?? 'Người cần giúp đỡ';
+    final String? avatarUrl = requester['avatarUrl'];
+    final String? phoneNumber = requester['phoneNumber'];
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          CircleAvatar(
+            radius: 26,
+            backgroundColor: const Color(0xFF008080).withOpacity(0.1),
+            backgroundImage: avatarUrl != null ? NetworkImage(avatarUrl) : null,
+            child: avatarUrl == null
+                ? const Icon(Icons.person, color: Color(0xFF008080), size: 30)
+                : null,
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Người cần giúp đỡ',
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: Colors.grey[600],
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  fullName,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF1A1A1A),
+                  ),
+                ),
+                if (phoneNumber != null) ...[
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.phone,
+                        size: 14,
+                        color: Color(0xFF008080),
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        phoneNumber,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFF008080),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ],

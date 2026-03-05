@@ -25,6 +25,9 @@ class HelpRequestModel {
   final List<String> proofImages;
   final String? completionNotes;
 
+  // Thông tin thêm của NCGD (Trả về từ getRequestDetail)
+  final Map<String, dynamic>? requester;
+
   HelpRequestModel({
     required this.id,
     required this.requesterId,
@@ -49,6 +52,7 @@ class HelpRequestModel {
     this.doneAt,
     required this.proofImages,
     this.completionNotes,
+    this.requester,
   });
 
   factory HelpRequestModel.fromJson(Map<String, dynamic> json) {
@@ -104,11 +108,16 @@ class HelpRequestModel {
           ? (json['longitude'] as num).toDouble()
           : null,
 
-      doneAt: json['doneAt'] != null ? DateTimeUtils.parseFromApi(json['doneAt']) : null,
+      doneAt: json['doneAt'] != null
+          ? DateTimeUtils.parseFromApi(json['doneAt'])
+          : null,
       proofImages:
           (json['proofImages'] as List?)?.map((e) => e.toString()).toList() ??
           [],
       completionNotes: json['completionNotes']?.toString(),
+      requester: json['requester'] != null
+          ? json['requester'] as Map<String, dynamic>
+          : null,
     );
   }
 }
